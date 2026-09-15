@@ -1,0 +1,83 @@
+# ==========================================
+# Dépendances (Node & PHP)
+# ==========================================
+node_modules/
+vendor/
+
+# ==========================================
+# Environnements & Fichiers de configuration
+# ==========================================
+.env
+.env.*
+.env.backup
+!.env.example
+*.local
+
+# ==========================================
+# Base de données (Conservation de SQLite pour GitHub)
+# ==========================================
+!*.sqlite
+!*.sqlite3
+!*.db
+!database.sqlite
+*.sqlite-journal
+
+# ==========================================
+# Build & Distribution (Front React / Vite)
+# ==========================================
+dist/
+dist-ssr/
+build/
+*.tsbuildinfo
+
+# ==========================================
+# Laravel & Backend
+# ==========================================
+public/hot
+public/storage
+storage/*.key
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+docker-compose.override.yml
+
+# ==========================================
+# Logs & Débogage
+# ==========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==========================================
+# Systèmes d'exploitation
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ==========================================
+# Éditeurs & IDEs
+# ==========================================
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.bak
