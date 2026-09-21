@@ -1,38 +1,36 @@
-# Culture Quiz 🧠🏆
+# QuizBall ⚽🏀🎾
 
-Application web de quiz de culture générale conçue en **Mobile-First**, développée avec **React (TypeScript + Vite)** pour le frontend et **Laravel** pour l'API backend.
+Quiz sportif conçu en **Mobile-First** : football, basket, tennis et tous sports.
+Frontend **React (TypeScript + Vite)**, API **Laravel**.
 
 ---
 
 ## 📁 Architecture du Projet
 
 ```text
-CultureQuizz/
+Quizball/
 ├── back/                   # Backend API (Laravel 8 / PHP)
 │   ├── app/                # Contrôleurs, Modèles
-│   ├── database/           # Migrations, seeders, base SQLite (suivie sur Git)
+│   ├── database/           # Migrations, seeder, base SQLite (suivie sur Git)
 │   ├── routes/api.php      # Endpoints de l'API
-│   └── culturequizz.sql    # Export SQL de la base de données
+│   └── culturequizz.sql    # Ancien export SQL (historique)
 ├── front/                  # Frontend (React 19 + TypeScript + Vite)
-│   ├── src/                # Composants, vues, services API, styles
-│   ├── public/             # Assets statiques
-│   └── package.json        # Dépendances et scripts front
-├── .env.example            # Modèle des variables d'environnement unique (racine)
+│   ├── src/views/          # Landing, réglages, quiz, résultats
+│   ├── src/services/api.ts # Appels à l'API Laravel
+│   ├── src/data/sports.ts  # Sports affichés (slug, nom, couleur)
+│   └── public/             # Assets statiques
+├── .env.example            # Modèle des variables d'environnement (racine)
 ├── .env                    # Variables d'environnement locales (racine)
-├── CultureQuizz.pdf        # Sujet et consignes du projet
-├── .gitignore              # Fichier d'exclusion Git unifié
-└── README.md               # Documentation globale d'installation
+└── README.md
 ```
 
 ---
 
 ## ⚙️ Prérequis
 
-Avant de commencer, assurez-vous d'avoir installé sur votre machine :
 - **Node.js** (v18 ou supérieur) et **npm**
-- **PHP** (>= 8.0) avec les extensions PDO (SQLite ou MySQL)
-- **Composer** (gestionnaire de paquets PHP)
-- *(Optionnel)* Un serveur de base de données **MySQL / MariaDB** (ex: Laragon, XAMPP, WampServer) si vous n'utilisez pas SQLite.
+- **PHP** (>= 8.0) avec les extensions PDO (SQLite)
+- **Composer** — si tu ne l'as pas, voir l'astuce ci-dessous
 
 ---
 
@@ -42,9 +40,8 @@ Avant de commencer, assurez-vous d'avoir installé sur votre machine :
 
 ```bash
 git clone <URL_DU_DEPOT_GITHUB>
-cd CultureQuizz
+cd Quizball
 
-# Créer votre fichier .env unique à la racine depuis le modèle :
 # Sur Windows (PowerShell) :
 copy .env.example .env
 
@@ -52,78 +49,37 @@ copy .env.example .env
 cp .env.example .env
 ```
 
----
+### 2. Backend (`back/`)
 
-### 2. Configuration du Backend (`back/`)
+```bash
+cd back
 
-Le backend expose les routes API nécessaires pour récupérer les catégories et les questions.
+# Si composer n'est pas installé sur la machine :
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php --quiet && rm composer-setup.php
+# puis utiliser "php composer.phar" au lieu de "composer"
 
-1. **Accédez au dossier backend :**
-   ```bash
-   cd back
-   ```
+composer install
+php artisan key:generate
+php artisan migrate:fresh --seed   # crée les tables et charge les 120 questions
+php artisan serve                  # http://127.0.0.1:8000
+```
 
-2. **Installez les dépendances PHP :**
-   ```bash
-   composer install
-   ```
+> ⚠️ **PHP 8.4** : le `composer.lock` fige des dépendances qui exigent PHP < 8.3.
+> Sur PHP 8.4, installer avec `composer install --ignore-platform-req=php`.
+> Les avertissements de dépréciation sont neutralisés en tête de `back/public/index.php`,
+> sinon ils s'affichent en HTML devant le JSON et cassent les réponses de l'API.
 
-3. **Générez la clé d'application Laravel :**
-   ```bash
-   php artisan key:generate
-   ```
+### 3. Frontend (`front/`)
 
-5. **Configuration de la Base de Données :**
+```bash
+cd front
+npm install
+npm run dev                        # http://localhost:5173
+```
 
-   - **Option A : SQLite (Recommandé en local / prêt à l'emploi)**
-     Vérifiez dans votre `.env` la configuration suivante :
-     ```env
-     DB_CONNECTION=sqlite
-     ```
-     *(La base `database/database.sqlite` est déjà présente. Si vous souhaitez réinitialiser les tables et données de test, exécutez `php artisan migrate --seed`)*.
-
-   - **Option B : MySQL**
-     Créez une base de données nommée `culturequizz` dans votre SGBD, puis importez le fichier [culturequizz.sql](file:///c:/Users/leodu/Documents/Cours/React%20JS/EXO/CultureQuizz/back/culturequizz.sql) ou configurez votre `.env` :
-     ```env
-     DB_CONNECTION=mysql
-     DB_HOST=127.0.0.1
-     DB_PORT=3306
-     DB_DATABASE=culturequizz
-     DB_USERNAME=root
-     DB_PASSWORD=
-     ```
-     Puis lancez :
-     ```bash
-     php artisan migrate --seed
-     ```
-
-6. **Démarrez le serveur Laravel :**
-   ```bash
-   php artisan serve
-   ```
-   > 🌐 L'API est désormais disponible sur : `http://127.0.0.1:8000`
-
----
-
-### 3. Configuration du Frontend (`front/`)
-
-Le frontend est développé en React avec Vite et TypeScript.
-
-1. **Ouvrez un nouveau terminal et rendez-vous dans le dossier front :**
-   ```bash
-   cd front
-   ```
-
-2. **Installez les dépendances Node :**
-   ```bash
-   npm install
-   ```
-
-3. **Lancez le serveur de développement :**
-   ```bash
-   npm run dev
-   ```
-   > 🚀 L'application s'ouvre sur : `http://localhost:5173`
+Le serveur Vite redirige `/api` vers `http://127.0.0.1:8000`, donc les deux serveurs
+doivent tourner en même temps pour jouer.
 
 ---
 
@@ -131,37 +87,52 @@ Le frontend est développé en React avec Vite et TypeScript.
 
 | Méthode | Route | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/categories` | Récupère toutes les catégories de quiz |
-| `GET` | `/api/questions` | Récupère la liste des questions et propositions |
-| `POST` | `/api/questions` | Ajoute une nouvelle question |
-| `PUT` | `/api/questions/{id}` | Modifie une question existante |
+| `GET` | `/api/categories` | Les sports jouables et leur nombre de questions |
+| `GET` | `/api/quiz?sport=foot&difficulte=moyen&limite=10` | Tire les questions d'une partie, propositions déjà mélangées |
+| `GET` | `/api/scores?sport=foot&limite=5` | Le classement des meilleurs scores |
+| `POST` | `/api/scores` | Enregistre le score d'une partie terminée |
+| `GET` | `/api/questions` | Toutes les questions (administration) |
+| `POST` | `/api/questions` | Ajoute une question |
+| `PUT` | `/api/questions/{id}` | Modifie une question |
 | `DELETE` | `/api/questions/{id}` | Supprime une question |
-| `GET` | `/api/users` | Récupère la liste des utilisateurs et scores |
-| `POST` | `/api/users` | Enregistre un nouveau score / utilisateur |
+
+**Paramètres** : `sport` vaut `foot`, `basket`, `tennis` ou `multi` ;
+`difficulte` vaut `facile`, `moyen`, `difficile` ou `toutes`.
 
 ---
 
-## 🎯 Fonctionnalités du Projet (Cahier des charges)
+## 🗄️ Schéma de la base
 
-- 📱 **Mobile-First** : Interface conçue prioritairement pour les smartphones.
-- 🏠 **Page d'accueil** : Logo de l'application et bouton de démarrage.
-- 📂 **Choix de la catégorie** : Chargement dynamique depuis l'API Laravel (`/api/categories`).
-- ⏱️ **Timer 30s** : Décompte visuel pour chaque question, passage automatique si le temps est écoulé.
-- 🎨 **Feedback visuel immédiat** :
-  - Réponse correcte : coloriage en **vert**.
-  - Mauvaise réponse : coloriage en **rouge**.
-- 📊 **Résultats & Score** : Affichage du score total à l'issue des 10 questions.
+| Table | Colonnes |
+| :--- | :--- |
+| `categories` | `slug`, `nom`, `couleur` |
+| `questions` | `categorie_id`, `question`, `bonne_reponse`, `mauvaise_1`, `mauvaise_2`, `mauvaise_3`, `difficulte` |
+| `parties` | `pseudo`, `categorie_id`, `difficulte`, `score`, `total` |
+
+Le seeder charge **120 questions** : 4 sports × 3 difficultés × 10 questions.
+
+---
+
+## 🎯 Fonctionnalités
+
+- 📱 **Mobile-First** : interface pensée d'abord pour le smartphone.
+- 🏠 **Landing** : choix du sport, qui lance directement le quiz correspondant.
+- 🎚️ **Réglages** : pseudo et difficulté (facile, moyen, difficile ou toutes).
+- ⏱️ **Timer 15s** : décompte visuel par question, passage automatique si le temps est écoulé.
+- 🎨 **Feedback immédiat** : bonne réponse en vert, mauvaise en rouge.
+- 📊 **Résultats** : score, récap des questions ratées avec la bonne réponse.
+- 🏆 **Classement** : score envoyé à l'API et top 5 par sport.
 
 ---
 
 ## 🛠️ Scripts Utiles
 
 ### Frontend (`front/`)
-- `npm run dev` : Démarre le serveur local Vite.
-- `npm run build` : Compile l'application TypeScript et génère le bundle de production dans `dist/`.
-- `npm run lint` : Vérifie la qualité du code avec Oxlint.
+- `npm run dev` : démarre le serveur local Vite.
+- `npm run build` : compile le TypeScript et génère le bundle de production.
+- `npm run lint` : vérifie la qualité du code avec Oxlint.
 
 ### Backend (`back/`)
-- `php artisan serve` : Démarre le serveur local de développement.
-- `php artisan route:list` : Liste toutes les routes de l'application.
-- `php artisan migrate:fresh --seed` : Réinitialise la base de données avec les seeders.
+- `php artisan serve` : démarre le serveur local.
+- `php artisan route:list` : liste toutes les routes.
+- `php artisan migrate:fresh --seed` : réinitialise la base et recharge les questions.

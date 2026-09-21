@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateCategoriesTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Les catégories de quiz : un sport par catégorie.
      *
      * @return void
      */
@@ -15,7 +15,9 @@ class CreateCategoriesTable extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('categorie');
+            $table->string('slug')->unique();   // foot, basket, tennis, multi
+            $table->string('nom');              // Football, Basket, ...
+            $table->string('couleur');          // couleur d'accent du front (#RRGGBB)
             $table->timestamps();
         });
     }

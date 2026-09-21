@@ -10,6 +10,24 @@ class Categorie extends Model
     use HasFactory;
 
     protected $fillable = [
-        'categorie',
+        'slug',
+        'nom',
+        'couleur',
     ];
+
+    /**
+     * Les questions de ce sport.
+     */
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
+
+    /**
+     * Les parties jouées sur ce sport.
+     */
+    public function parties()
+    {
+        return $this->hasMany(Partie::class);
+    }
 }

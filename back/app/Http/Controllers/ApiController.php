@@ -8,95 +8,66 @@ use Illuminate\Http\Request;
 class ApiController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Toutes les questions, avec leur sport.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return response()->json(Question::all());
+        return response()->json(Question::with('categorie')->get());
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Les règles de validation d'une question.
      *
-     * @return \Illuminate\Http\Response
+     * @return array<string, string>
      */
-    public function create()
+    private function regles(): array
     {
-        $item = Question::create($request->all());
-        return response()->json($item);
+        return [
+            'categorie_id' => 'required|exists:categories,id',
+            'question' => 'required|string|max:255',
+            'bonne_reponse' => 'required|string|max:255',
+            'mauvaise_1' => 'required|string|max:255',
+            'mauvaise_2' => 'required|string|max:255',
+            'mauvaise_3' => 'required|string|max:255',
+            'difficulte' => 'required|in:facile,moyen,difficile',
+        ];
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Ajoute une question.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $item = Question::create($request->all());
-        return response()->json($item);
+        $question = Question::create($request->validate($this->regles()));
+
+        return response()->json($question, 201);
     }
 
     /**
-     * Display the specified resource.
+     * Modifie une question existante.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $questionid = Question::find($id);
-        if($questionid){
-            $questionid->update(
-                [
-                    'categorie'=> $request->categorie,
-                    'question'=> $request->question,
-                    'reponse1'=> $request->reponse1,
-                    'reponse2'=> $request->reponse2,
-                    'reponse3'=> $request->reponse3,
-                    'reponse4'=> $request->reponse4,
-                    'reponse5'=> $request->reponse5,
-                    'reponse6'=> $request->reponse6,
-                    'reponse7'=> $request->reponse7,
-                    'reponse8'=> $request->reponse8,
-                    'reponse9'=> $request->reponse9,
-                    'reponse10'=> $request->reponse10,
+        $question = Question::find($id);
 
-        ]);
-            return response()->json($questionid);
-        }else{
-            return response()->json(['id non trouvé']);
+        if (! $question) {
+            return response()->json(['message' => 'Question introuvable.'], 404);
         }
+
+        $question->update($request->validate($this->regles()));
+
+        return response()->json($question);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Supprime une question.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -104,11 +75,13 @@ class ApiController extends Controller
     public function destroy($id)
     {
         $question = Question::find($id);
-        if($question){
-            $question->delete();
-            return response()->json(["status" => "success"]);
-        }else{
-            return response()->json(["status" => "error"]);
+
+        if (! $question) {
+            return response()->json(['message' => 'Question introuvable.'], 404);
         }
+
+        $question->delete();
+
+        return response()->json(['message' => 'Question supprimée.']);
     }
 }
