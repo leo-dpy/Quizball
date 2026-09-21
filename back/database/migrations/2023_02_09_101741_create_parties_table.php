@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreatePartiesTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Une partie terminée : le score d'un joueur sur un sport.
      *
      * @return void
      */
@@ -15,8 +15,11 @@ class CreatePartiesTable extends Migration
     {
         Schema::create('parties', function (Blueprint $table) {
             $table->id();
-            $table->integer('idjoueur');
-            $table->integer('score');
+            $table->string('pseudo');
+            $table->foreignId('categorie_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->string('difficulte');
+            $table->unsignedInteger('score');
+            $table->unsignedInteger('total');
             $table->timestamps();
         });
     }

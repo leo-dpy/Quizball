@@ -2,108 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Question;
 use App\Models\Categorie;
+use App\Models\Question;
 use Illuminate\Http\Request;
 
 class QuizzController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * La liste des questions (page d'administration).
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $questions = Question::all();
         return view('listequestions', [
-            'questions' => $questions
+            'questions' => Question::with('categorie')->orderBy('categorie_id')->get(),
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Le formulaire de création d'une question.
      *
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
-        $categories = Categorie::all();
         return view('createQuestion', [
-            'categories' => $categories
+            'categories' => Categorie::orderBy('id')->get(),
+            'difficultes' => Question::DIFFICULTES,
         ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Enregistre une nouvelle question.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'categorie' => 'required',
-            'question' => 'required',
-            'reponse1' => 'required',
-            'reponse2' => 'required',
-            'reponse3' => 'required',
-            'reponse4' => 'required',
-            'reponse5' => 'required',
-            'reponse6' => 'required',
-            'reponse7' => 'required',
-            'reponse8' => 'required',
-            'reponse9' => 'required',
-            'reponse10' => 'required',
+        $donnees = $request->validate([
+            'categorie_id' => 'required|exists:categories,id',
+            'question' => 'required|string|max:255',
+            'bonne_reponse' => 'required|string|max:255',
+            'mauvaise_1' => 'required|string|max:255',
+            'mauvaise_2' => 'required|string|max:255',
+            'mauvaise_3' => 'required|string|max:255',
+            'difficulte' => 'required|in:facile,moyen,difficile',
         ]);
 
-        Question::create($validatedData);
-        return redirect('/listequestions')->with('status', 'Question créée avec succès!');
+        Question::create($donnees);
 
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return redirect('/listequestions')->with('status', 'Question créée avec succès !');
     }
 }

@@ -81,3 +81,6 @@ $RECYCLE.BIN/
 *.sln
 *.sw?
 *.bak
+
+# Composer installé localement (PHP 8.4 sans composer global)
+back/composer.phar

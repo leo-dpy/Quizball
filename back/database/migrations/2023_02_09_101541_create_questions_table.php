@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateQuestionsTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Une question = 1 bonne réponse + 3 mauvaises + une difficulté.
      *
      * @return void
      */
@@ -15,18 +15,13 @@ class CreateQuestionsTable extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->string('categorie');
+            $table->foreignId('categorie_id')->constrained('categories')->cascadeOnDelete();
             $table->string('question');
-            $table->string('reponse1');
-            $table->string('reponse2');
-            $table->string('reponse3');
-            $table->string('reponse4');
-            $table->string('reponse5');
-            $table->string('reponse6');
-            $table->string('reponse7');
-            $table->string('reponse8');
-            $table->string('reponse9');
-            $table->string('reponse10');
+            $table->string('bonne_reponse');
+            $table->string('mauvaise_1');
+            $table->string('mauvaise_2');
+            $table->string('mauvaise_3');
+            $table->string('difficulte')->default('moyen'); // facile, moyen, difficile
             $table->timestamps();
         });
     }

@@ -5,6 +5,14 @@
   padding: 0;
 }
 
+:root {
+  /* Palette QuizBall, calée sur le logo */
+  --bg: #030A14;
+  --ink: #F7F8FA;
+  --accent: #01C187;
+  --accent-rgb: 1, 193, 135;
+}
+
 body {
   font-family: 'Barlow Semi Condensed', system-ui, -apple-system, sans-serif;
   background-color: #030A14;

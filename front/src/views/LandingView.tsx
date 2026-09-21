@@ -4,20 +4,7 @@ import type { CSSProperties, MouseEvent } from 'react';
 import logo from '../assets/quizball-logo.png';
 import './LandingView.css';
 
-type SportId = 'foot' | 'basket' | 'tennis';
-
-interface Sport {
-  id: SportId;
-  name: string;
-  color: string;
-  rgb: string;
-}
-
-const SPORTS: Sport[] = [
-  { id: 'foot', name: 'FOOTBALL', color: '#01C187', rgb: '1, 193, 135' },
-  { id: 'basket', name: 'BASKET', color: '#FE8D07', rgb: '254, 141, 7' },
-  { id: 'tennis', name: 'TENNIS', color: '#FFC93C', rgb: '255, 201, 60' },
-];
+import { SPORTS } from '../data/sports';
 
 const MODES = [
   { title: 'SOLO', desc: '10 questions, difficulté croissante. Le classique pour se chauffer.' },
@@ -60,11 +47,12 @@ function magnetLeave(e: MouseEvent<HTMLElement>) {
 }
 
 interface LandingViewProps {
-  onPlay: () => void;
+  /** Lance une partie sur le sport sélectionné. */
+  onPlay: (sport: string) => void;
 }
 
 export function LandingView({ onPlay }: LandingViewProps) {
-  const [sport, setSport] = useState<SportId>('foot');
+  const [sport, setSport] = useState('foot');
   const [scrolled, setScrolled] = useState(() => window.scrollY > 40);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [subscribed, setSubscribed] = useState(false);
@@ -162,7 +150,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
           <a href="#modes">MODES</a>
           <a href="#retention">PROGRESSION</a>
           <a href="#pricing">TARIFS</a>
-          <button type="button" className="qb-btn qb-btn--small" onClick={onPlay} onMouseMove={magnetMove} onMouseLeave={magnetLeave}>
+          <button type="button" className="qb-btn qb-btn--small" onClick={() => onPlay(sport)} onMouseMove={magnetMove} onMouseLeave={magnetLeave}>
             JOUER
           </button>
         </nav>
@@ -177,7 +165,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
             <span className="qb-accent">le plus fort</span>
           </h1>
           <p className="qb-hero__lead">
-            Football, basket, tennis. Des vraies questions, un chrono qui te met la pression, et un classement pour humilier tes potes.
+            Football, basket, tennis ou tous les sports. Choisis ton terrain, le quiz démarre aussitôt : 10 questions, 15 secondes chacune, et un classement pour humilier tes potes.
           </p>
 
           <div className="qb-pills">
@@ -207,16 +195,20 @@ export function LandingView({ onPlay }: LandingViewProps) {
                     {s.id === 'foot' && <div className="qb-ball__pattern" />}
                   </div>
                 ))}
-                <div className="qb-ball__seam" />
-                <div className="qb-ball__seam qb-ball__seam--h" />
-                <div className="qb-ball__ring" />
+                {sport !== 'multi' && (
+                  <>
+                    <div className="qb-ball__seam" />
+                    <div className="qb-ball__seam qb-ball__seam--h" />
+                    <div className="qb-ball__ring" />
+                  </>
+                )}
               </div>
             </div>
           </div>
 
           <div className="qb-cta-row">
-            <button type="button" className="qb-btn qb-btn--main" onClick={onPlay} onMouseMove={magnetMove} onMouseLeave={magnetLeave}>
-              JOUER MAINTENANT
+            <button type="button" className="qb-btn qb-btn--main" onClick={() => onPlay(sport)} onMouseMove={magnetMove} onMouseLeave={magnetLeave}>
+              JOUER AU QUIZ {active.name}
             </button>
             <a href="#pricing" className="qb-btn qb-btn--ghost">
               VOIR LES OFFRES
@@ -325,7 +317,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
             <div className="qb-footer__links">
               <a href="#modes">Modes de jeu</a>
               <a href="#pricing">Tarifs</a>
-              <button type="button" className="qb-link-btn" onClick={onPlay}>
+              <button type="button" className="qb-link-btn" onClick={() => onPlay(sport)}>
                 Jouer
               </button>
             </div>

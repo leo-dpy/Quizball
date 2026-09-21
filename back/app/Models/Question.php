@@ -9,35 +9,43 @@ class Question extends Model
 {
     use HasFactory;
 
+    /** Les trois niveaux acceptés. */
+    public const DIFFICULTES = ['facile', 'moyen', 'difficile'];
+
     protected $fillable = [
-        'categorie',
+        'categorie_id',
         'question',
-        'reponse1',
-        'reponse2',
-        'reponse3',
-        'reponse4',
-        'reponse5',
-        'reponse6',
-        'reponse7',
-        'reponse8',
-        'reponse9',
-        'reponse10',
+        'bonne_reponse',
+        'mauvaise_1',
+        'mauvaise_2',
+        'mauvaise_3',
+        'difficulte',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * Le sport auquel la question appartient.
      */
-    protected $hidden = [
-
-    ];
+    public function categorie()
+    {
+        return $this->belongsTo(Categorie::class);
+    }
 
     /**
-     * The attributes that should be cast.
+     * Les 4 propositions, mélangées : la bonne réponse et les trois leurres.
      *
-     * @var array<string, string>
+     * @return array<int, string>
      */
-    protected $casts = [
-    ];
+    public function propositions(): array
+    {
+        $propositions = [
+            $this->bonne_reponse,
+            $this->mauvaise_1,
+            $this->mauvaise_2,
+            $this->mauvaise_3,
+        ];
+
+        shuffle($propositions);
+
+        return $propositions;
+    }
 }
