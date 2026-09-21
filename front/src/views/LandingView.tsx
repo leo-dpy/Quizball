@@ -155,8 +155,9 @@ export function LandingView({ onPlay }: LandingViewProps) {
       <canvas ref={canvasRef} className="qb-canvas" aria-hidden="true" />
 
       <header className={`qb-header${scrolled ? ' is-scrolled' : ''}`}>
-        <a href="#" className="qb-logo" aria-label="QuizBall — retour en haut">
-          <img src={logo} alt="QuizBall" />
+        <a href="#" className="qb-logo" aria-label="Culture Quiz — retour en haut" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img src={logo} alt="Culture Quiz" />
+          <span style={{ fontFamily: 'Bebas Neue', fontSize: '24px', letterSpacing: '1px', color: 'var(--ink)' }}>CULTURE QUIZ</span>
         </a>
         <nav className="qb-nav">
           <a href="#modes">MODES</a>
@@ -170,7 +171,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
 
       <section className="qb-hero" onMouseMove={handleHeroMouseMove} onMouseLeave={() => setTilt({ x: 0, y: 0 })}>
         <div className="qb-hero__inner">
-          <div className="qb-kicker qb-kicker--muted">QUIZ SPORTIF · ARÈNE NOCTURNE</div>
+          <div className="qb-kicker qb-kicker--muted">CULTURE QUIZ · ARÈNE CHRONOMÉTRÉE 30S</div>
           <h1 className="qb-title qb-hero__title">
             Prouve que t'es
             <br />

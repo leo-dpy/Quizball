@@ -12,9 +12,13 @@ class ApiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Question::all());
+        $query = Question::query();
+        if ($request->filled('categorie')) {
+            $query->where('categorie', $request->query('categorie'));
+        }
+        return response()->json($query->get());
     }
 
     /**
