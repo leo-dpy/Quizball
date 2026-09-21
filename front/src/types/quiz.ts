@@ -20,3 +20,26 @@ export interface Question {
   reponse9: string;
   reponse10: string;
 }
+
+export interface PreparedQuestion {
+  id: number;
+  categorie: string;
+  question: string;
+  correctAnswer: string;
+  options: string[]; // Exactement 4 propositions mélangées
+}
+
+export interface QuestionAnswerRecord {
+  question: string;
+  correctAnswer: string;
+  selectedAnswer: string | null;
+  isCorrect: boolean;
+  timedOut: boolean;
+}
+
+export interface QuizSummary {
+  category: string;
+  totalQuestions: number;
+  score: number;
+  records: QuestionAnswerRecord[];
+}
