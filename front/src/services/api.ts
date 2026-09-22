@@ -1,4 +1,5 @@
 // Appels à l'API Laravel (/api/categories, /api/quiz, /api/scores)
+import type { ModeId } from '../data/modes';
 import type { Categorie, Difficulte, Score, Tirage } from '../types/quiz';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
@@ -38,14 +39,17 @@ export const api = {
     return requete<Categorie[]>(url('/categories'));
   },
 
-  /** Le tirage des questions d'une partie. */
-  tirage(sport: string, difficulte: Difficulte, limite = 10): Promise<Tirage> {
-    return requete<Tirage>(url('/quiz', { sport, difficulte, limite }));
+  /**
+   * Le tirage des questions d'une partie.
+   * Avec une graine, le tirage est le même pour tout le monde (défi du jour).
+   */
+  tirage(sport: string, difficulte: Difficulte, limite = 10, graine?: string): Promise<Tirage> {
+    return requete<Tirage>(url('/quiz', { sport, difficulte, limite, graine }));
   },
 
-  /** Le classement des meilleurs scores. */
-  classement(sport?: string, limite = 5): Promise<Score[]> {
-    return requete<Score[]>(url('/scores', { sport, limite }));
+  /** Le classement des meilleurs scores, par sport et par mode. */
+  classement(sport?: string, mode?: ModeId, limite = 5): Promise<Score[]> {
+    return requete<Score[]>(url('/scores', { sport, mode, limite }));
   },
 
   /** Enregistre le score d'une partie terminée. */
@@ -53,6 +57,7 @@ export const api = {
     pseudo: string;
     sport: string;
     difficulte: Difficulte;
+    mode: ModeId;
     score: number;
     total: number;
   }): Promise<Score> {

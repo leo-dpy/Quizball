@@ -1,23 +1,41 @@
-// Écran de fin : score, récap des erreurs et classement
+// Écran de fin : score adapté au mode, récap des erreurs et classement
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import logo from '../assets/quizball-logo.png';
 import { api } from '../services/api';
 import { trouverSport } from '../data/sports';
+import { graineDuJour, trouverMode } from '../data/modes';
+import type { ModeId } from '../data/modes';
 import type { Difficulte, ReponseJoueur, Score } from '../types/quiz';
 import './quiz.css';
 
 interface ResultsViewProps {
   sport: string;
   difficulte: Difficulte;
+  mode: ModeId;
   pseudo: string;
   reponses: ReponseJoueur[];
+  /** Série de jours consécutifs, calculée à la fin de la partie (défi du jour). */
+  serie: number;
   onRejouer: () => void;
   onChangerSport: () => void;
 }
 
-/** Le petit mot qui accompagne le score. */
-function bilan(score: number, total: number): string {
+/** Le petit mot qui accompagne le score, selon le mode joué. */
+function bilan(mode: ModeId, score: number, total: number): string {
+  if (mode === 'survie') {
+    if (score === 0) return 'Éliminé dès la première question. Ça pique.';
+    if (score < 5) return `${score} bonnes réponses avant la chute. Tu peux faire mieux.`;
+    if (score < 10) return `Belle série de ${score}. Tu commences à tenir.`;
+    return `${score} d'affilée sans faute. Monstrueux.`;
+  }
+
+  if (mode === 'chrono') {
+    if (score < 3) return 'La sirène a sonné trop vite pour toi.';
+    if (score < 7) return `${score} bonnes réponses en 60 secondes. Correct.`;
+    return `${score} bonnes réponses en 60 secondes. Machine.`;
+  }
+
   const ratio = total === 0 ? 0 : score / total;
   if (ratio === 1) return 'Sans faute. Personne ne te conteste le titre.';
   if (ratio >= 0.8) return 'Gros niveau, tu connais ton sujet.';
@@ -26,19 +44,21 @@ function bilan(score: number, total: number): string {
   return 'Aïe. On va dire que tu débutes.';
 }
 
-export function ResultsView({ sport, difficulte, pseudo, reponses, onRejouer, onChangerSport }: ResultsViewProps) {
+export function ResultsView({ sport, difficulte, mode, pseudo, reponses, serie, onRejouer, onChangerSport }: ResultsViewProps) {
   const [classement, setClassement] = useState<Score[] | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [copie, setCopie] = useState(false);
   const envoi = useRef<Promise<Score> | null>(null);
 
   const infosSport = trouverSport(sport);
+  const config = trouverMode(mode);
   const style = { '--accent': infosSport.color, '--accent-rgb': infosSport.rgb } as CSSProperties;
 
   const total = reponses.length;
   const score = reponses.filter((r) => r.correcte).length;
   const ratees = reponses.filter((r) => !r.correcte);
 
-  // Envoi du score, puis récupération du classement.
+  // Envoi du score, puis récupération du classement du mode.
   // En mode strict, React monte le composant deux fois : on réutilise la même promesse
   // d'envoi pour enregistrer le score une seule fois tout en affichant le classement.
   useEffect(() => {
@@ -47,11 +67,11 @@ export function ResultsView({ sport, difficulte, pseudo, reponses, onRejouer, on
     let annule = false;
 
     if (!envoi.current) {
-      envoi.current = api.enregistrerScore({ pseudo, sport, difficulte, score, total });
+      envoi.current = api.enregistrerScore({ pseudo, sport, difficulte, mode, score, total });
     }
 
     envoi.current
-      .then(() => api.classement(sport, 5))
+      .then(() => api.classement(sport, mode, 5))
       .then((tops) => {
         if (!annule) setClassement(tops);
       })
@@ -62,23 +82,55 @@ export function ResultsView({ sport, difficulte, pseudo, reponses, onRejouer, on
     return () => {
       annule = true;
     };
-  }, [pseudo, sport, difficulte, score, total]);
+  }, [pseudo, sport, difficulte, mode, score, total]);
+
+  /** Copie le résultat du défi sous forme de grille, à coller dans une conversation. */
+  const copierResultat = async () => {
+    const grille = reponses.map((r) => (r.correcte ? '🟩' : '🟥')).join('');
+    const texte = `QuizBall — Défi du jour ${graineDuJour()} · ${infosSport.name}\n${score}/${total}\n${grille}`;
+    try {
+      await navigator.clipboard.writeText(texte);
+      setCopie(true);
+    } catch {
+      setCopie(false);
+    }
+  };
 
   return (
     <div className="qz" style={style}>
       <div className="qz__inner">
         <img className="qz-logo" src={logo} alt="QuizBall" />
 
-        <div className="qz-kicker">QUIZ {infosSport.name}</div>
+        <div className="qz-kicker">{config.nom} · {infosSport.name}</div>
         <p className="qz-score">
-          {score}<span className="qz-score__total"> / {total}</span>
+          {score}
+          {config.mortSubite ? (
+            <span className="qz-score__total"> d'affilée</span>
+          ) : (
+            <span className="qz-score__total"> / {total}</span>
+          )}
         </p>
-        <p className="qz-bilan">{bilan(score, total)}</p>
+        <p className="qz-bilan">{bilan(mode, score, total)}</p>
+
+        {config.defiDuJour && serie > 0 && (
+          <p className="qz-serie">🔥 SÉRIE DE {serie} JOUR{serie > 1 ? 'S' : ''}</p>
+        )}
 
         <div className="qz-actions">
-          <button className="qz-btn" type="button" onClick={onRejouer}>REJOUER</button>
+          {!config.defiDuJour && (
+            <button className="qz-btn" type="button" onClick={onRejouer}>REJOUER</button>
+          )}
+          {config.defiDuJour && (
+            <button className="qz-btn" type="button" onClick={copierResultat}>
+              {copie ? 'RÉSULTAT COPIÉ ✓' : 'COPIER MON RÉSULTAT'}
+            </button>
+          )}
           <button className="qz-btn qz-btn--ghost" type="button" onClick={onChangerSport}>CHANGER DE SPORT</button>
         </div>
+
+        {config.defiDuJour && (
+          <p className="qz-grille">{reponses.map((r) => (r.correcte ? '🟩' : '🟥')).join('')}</p>
+        )}
 
         {ratees.length > 0 && (
           <>
@@ -99,11 +151,11 @@ export function ResultsView({ sport, difficulte, pseudo, reponses, onRejouer, on
           </>
         )}
 
-        <h2 className="qz-section-titre">Meilleurs scores — {infosSport.name}</h2>
+        <h2 className="qz-section-titre">Meilleurs scores — {config.nom}, {infosSport.name}</h2>
         {erreur && <p className="qz-erreur-api">{erreur}</p>}
         {!erreur && classement === null && <p className="qz-chargement">Enregistrement du score…</p>}
         {!erreur && classement !== null && classement.length === 0 && (
-          <p className="qz-info">Aucun score enregistré pour ce sport.</p>
+          <p className="qz-info">Aucun score enregistré pour ce mode.</p>
         )}
         {!erreur && classement !== null && classement.length > 0 && (
           <ul className="qz-classement">

@@ -18,6 +18,7 @@ class CreatePartiesTable extends Migration
             $table->string('pseudo');
             $table->foreignId('categorie_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->string('difficulte');
+            $table->string('mode')->default('solo'); // solo, chrono, survie, defi
             $table->unsignedInteger('score');
             $table->unsignedInteger('total');
             $table->timestamps();

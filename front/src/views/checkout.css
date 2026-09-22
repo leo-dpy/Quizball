@@ -1,0 +1,181 @@
+/* Page de paiement fictive */
+.ck {
+  --accent: #01C187;
+  --accent-rgb: 1, 193, 135;
+  min-height: 100vh;
+  padding: 24px 16px 48px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Barlow Semi Condensed', sans-serif;
+}
+
+.ck__inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ck :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.ck-bandeau {
+  margin: 0 0 28px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 201, 60, .45);
+  border-radius: 6px;
+  background: rgba(255, 201, 60, .1);
+  color: #FFD978;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  text-align: center;
+}
+
+.ck-logo {
+  display: block;
+  height: 46px;
+  width: auto;
+  margin: 0 auto 24px;
+}
+
+.ck-titre {
+  margin: 0 0 6px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-style: italic;
+  text-transform: uppercase;
+  transform: skewX(-6deg);
+  font-size: clamp(30px, 6vw, 44px);
+  text-align: center;
+}
+
+.ck-prix {
+  margin: 0 0 28px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  color: var(--accent);
+  text-align: center;
+}
+
+.ck-grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.ck-carte {
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .04);
+}
+
+.ck-sous-titre {
+  margin: 0 0 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.ck-features {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(247, 248, 250, .7);
+}
+
+.ck-label {
+  display: block;
+  margin: 16px 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(247, 248, 250, .5);
+}
+
+.ck-champ {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .06);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.ck-ligne {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ck-btn {
+  width: 100%;
+  margin-top: 22px;
+  padding: 15px;
+  border: none;
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.ck-note {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: rgba(247, 248, 250, .45);
+  text-align: center;
+}
+
+.ck-retour {
+  display: block;
+  margin: 28px auto 0;
+  padding: 8px;
+  border: none;
+  background: none;
+  color: rgba(247, 248, 250, .45);
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.ck-confirmation {
+  max-width: 460px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ck-coche {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: rgba(var(--accent-rgb), .15);
+  color: var(--accent);
+  font-size: 34px;
+  line-height: 64px;
+}
+
+.ck-texte {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(247, 248, 250, .7);
+}
+
+@media (min-width: 720px) {
+  .ck-grille {
+    grid-template-columns: 1fr 1.2fr;
+  }
+}

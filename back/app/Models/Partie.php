@@ -9,10 +9,14 @@ class Partie extends Model
 {
     use HasFactory;
 
+    /** Les modes de jeu acceptés. */
+    public const MODES = ['solo', 'chrono', 'survie', 'defi'];
+
     protected $fillable = [
         'pseudo',
         'categorie_id',
         'difficulte',
+        'mode',
         'score',
         'total',
     ];

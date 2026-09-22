@@ -115,6 +115,59 @@
   margin-top: 22px;
 }
 
+/* Sélecteur de mode de jeu */
+.qz-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.qz-mode {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(247, 248, 250, .6);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-align: left;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.qz-mode.is-active {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), .13);
+  color: var(--accent);
+}
+
+/* Série du défi du jour */
+.qz-serie {
+  margin: -14px 0 24px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: #FE8D07;
+  text-align: center;
+}
+
+/* Grille de résultat du défi du jour */
+.qz-grille {
+  margin: 16px 0 0;
+  font-size: 22px;
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+.qz-info strong {
+  color: var(--ink);
+}
+
 .qz-btn {
   display: inline-block;
   width: 100%;
