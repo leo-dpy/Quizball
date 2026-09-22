@@ -1,4 +1,5 @@
 // Définition des types TypeScript pour QuizBall
+import type { ModeId } from '../data/modes';
 
 /** Les niveaux de difficulté ; « toutes » mélange les trois. */
 export type Difficulte = 'facile' | 'moyen' | 'difficile' | 'toutes';
@@ -40,6 +41,7 @@ export interface Score {
   sport: string | null;
   sport_nom: string | null;
   difficulte: Difficulte;
+  mode: ModeId;
   score: number;
   total: number;
   date: string;
@@ -56,5 +58,6 @@ export interface ReponseJoueur {
 export interface Reglages {
   sport: string;
   difficulte: Difficulte;
+  mode: ModeId;
   pseudo: string;
 }

@@ -1,25 +1,30 @@
-// Écran de jeu : 10 questions, 15 secondes chacune, feedback vert/rouge
-import { useCallback, useEffect, useState } from 'react';
+// Écran de jeu. Le comportement dépend du mode : questions comptées, chrono global ou mort subite.
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Timer } from '../components/Timer';
 import { api } from '../services/api';
 import { trouverSport } from '../data/sports';
+import { graineDuJour, trouverMode } from '../data/modes';
+import type { ModeId } from '../data/modes';
 import type { Difficulte, QuestionQuiz, ReponseJoueur } from '../types/quiz';
 import './quiz.css';
 
-/** Durée d'une question, en secondes. */
-const DUREE = 15;
-/** Temps d'affichage du corrigé avant la question suivante, en millisecondes. */
-const PAUSE_CORRECTION = 1600;
+/** Réservoir de questions pour les modes sans nombre fixe (chrono, survie). */
+const RESERVE = 30;
+/** Ordre des paliers du mode survie. */
+const PALIERS: Difficulte[] = ['facile', 'moyen', 'difficile'];
 
 interface QuizViewProps {
   sport: string;
   difficulte: Difficulte;
+  mode: ModeId;
   onTermine: (reponses: ReponseJoueur[]) => void;
   onQuitter: () => void;
 }
 
-export function QuizView({ sport, difficulte, onTermine, onQuitter }: QuizViewProps) {
+export function QuizView({ sport, difficulte, mode, onTermine, onQuitter }: QuizViewProps) {
+  const config = trouverMode(mode);
+
   const [questions, setQuestions] = useState<QuestionQuiz[]>([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -27,24 +32,49 @@ export function QuizView({ sport, difficulte, onTermine, onQuitter }: QuizViewPr
   const [index, setIndex] = useState(0);
   const [choix, setChoix] = useState<string | null>(null);
   const [figee, setFigee] = useState(false);
-  const [restant, setRestant] = useState(DUREE);
+  const [restant, setRestant] = useState(config.secondesParQuestion);
+  const [tempsPartie, setTempsPartie] = useState(config.secondesPartie);
   const [reponses, setReponses] = useState<ReponseJoueur[]>([]);
+
+  // Copie des réponses lisible depuis les minuteurs, qui ne voient pas l'état à jour
+  const reponsesRef = useRef<ReponseJoueur[]>([]);
+  const termine = useRef(false);
 
   const infosSport = trouverSport(sport);
   const style = { '--accent': infosSport.color, '--accent-rgb': infosSport.rgb } as CSSProperties;
+
+  /** Termine la partie une seule fois, quel que soit le minuteur qui déclenche. */
+  const terminer = useCallback(() => {
+    if (termine.current) return;
+    termine.current = true;
+    onTermine(reponsesRef.current);
+  }, [onTermine]);
 
   // Tirage des questions au démarrage
   useEffect(() => {
     let annule = false;
 
+    const limite = config.nbQuestions > 0 ? config.nbQuestions : RESERVE;
+    const niveau: Difficulte = config.choixDifficulte ? difficulte : 'toutes';
+    const graine = config.defiDuJour ? graineDuJour() : undefined;
+
     api
-      .tirage(sport, difficulte)
+      .tirage(sport, niveau, limite, graine)
       .then((tirage) => {
         if (annule) return;
-        if (tirage.questions.length === 0) {
+        let liste = tirage.questions;
+
+        // En survie, on monte les paliers : facile, puis moyen, puis difficile
+        if (config.mortSubite) {
+          liste = [...liste].sort(
+            (a, b) => PALIERS.indexOf(a.difficulte) - PALIERS.indexOf(b.difficulte),
+          );
+        }
+
+        if (liste.length === 0) {
           setErreur('Aucune question pour ce sport et cette difficulté.');
         }
-        setQuestions(tirage.questions);
+        setQuestions(liste);
         setChargement(false);
       })
       .catch((e: Error) => {
@@ -56,7 +86,7 @@ export function QuizView({ sport, difficulte, onTermine, onQuitter }: QuizViewPr
     return () => {
       annule = true;
     };
-  }, [sport, difficulte]);
+  }, [sport, difficulte, config]);
 
   const question = questions[index];
 
@@ -65,31 +95,31 @@ export function QuizView({ sport, difficulte, onTermine, onQuitter }: QuizViewPr
     (proposition: string | null) => {
       if (figee || !question) return;
 
+      const reponse: ReponseJoueur = {
+        question,
+        choix: proposition,
+        correcte: proposition === question.bonne_reponse,
+      };
+
+      reponsesRef.current = [...reponsesRef.current, reponse];
+      setReponses(reponsesRef.current);
       setChoix(proposition);
       setFigee(true);
-      setReponses((liste) => [
-        ...liste,
-        {
-          question,
-          choix: proposition,
-          correcte: proposition === question.bonne_reponse,
-        },
-      ]);
     },
     [figee, question],
   );
 
-  // Décompte : une question non répondue à temps compte comme ratée
+  // Chrono par question (solo, survie, défi)
   useEffect(() => {
+    if (config.secondesParQuestion === 0) return;
     if (chargement || erreur || figee || !question) return;
 
     const debut = Date.now();
-    const timer = window.setInterval(() => {
-      const ecoule = (Date.now() - debut) / 1000;
-      const reste = DUREE - ecoule;
+    const minuteur = window.setInterval(() => {
+      const reste = config.secondesParQuestion - (Date.now() - debut) / 1000;
 
       if (reste <= 0) {
-        window.clearInterval(timer);
+        window.clearInterval(minuteur);
         setRestant(0);
         repondre(null);
       } else {
@@ -97,26 +127,57 @@ export function QuizView({ sport, difficulte, onTermine, onQuitter }: QuizViewPr
       }
     }, 100);
 
-    return () => window.clearInterval(timer);
-  }, [chargement, erreur, figee, question, repondre]);
+    return () => window.clearInterval(minuteur);
+  }, [chargement, erreur, figee, question, repondre, config.secondesParQuestion]);
+
+  // Chrono global (contre-la-montre) : la sirène arrête la partie sur-le-champ
+  useEffect(() => {
+    if (config.secondesPartie === 0 || chargement || erreur) return;
+
+    const debut = Date.now();
+    const minuteur = window.setInterval(() => {
+      const reste = config.secondesPartie - (Date.now() - debut) / 1000;
+
+      if (reste <= 0) {
+        window.clearInterval(minuteur);
+        setTempsPartie(0);
+        terminer();
+      } else {
+        setTempsPartie(reste);
+      }
+    }, 100);
+
+    return () => window.clearInterval(minuteur);
+  }, [chargement, erreur, config.secondesPartie, terminer]);
 
   // Passage à la question suivante, ou fin de partie
   useEffect(() => {
     if (!figee) return;
 
+    // Le corrigé s'affiche moins longtemps quand le chrono global tourne
+    const pause = config.secondesPartie > 0 ? 700 : 1600;
+
     const suite = window.setTimeout(() => {
-      if (index + 1 >= questions.length) {
-        onTermine(reponses);
+      const derniere = reponsesRef.current[reponsesRef.current.length - 1];
+
+      if (config.mortSubite && derniere && !derniere.correcte) {
+        terminer();
         return;
       }
+
+      if (index + 1 >= questions.length) {
+        terminer();
+        return;
+      }
+
       setIndex((i) => i + 1);
       setChoix(null);
       setFigee(false);
-      setRestant(DUREE);
-    }, PAUSE_CORRECTION);
+      setRestant(config.secondesParQuestion);
+    }, pause);
 
     return () => window.clearTimeout(suite);
-  }, [figee, index, questions.length, reponses, onTermine]);
+  }, [figee, index, questions.length, config.mortSubite, config.secondesPartie, config.secondesParQuestion, terminer]);
 
   if (chargement) {
     return (
@@ -140,22 +201,41 @@ export function QuizView({ sport, difficulte, onTermine, onQuitter }: QuizViewPr
   }
 
   const bonnes = reponses.filter((r) => r.correcte).length;
-  const progression = ((index + (figee ? 1 : 0)) / questions.length) * 100;
+  const chronoGlobal = config.secondesPartie > 0;
+
+  // Ce que montre le compteur du milieu et la barre, selon le mode
+  let compteur: string;
+  let progression: number;
+  if (chronoGlobal) {
+    compteur = `${Math.ceil(tempsPartie)} S RESTANTES`;
+    progression = (tempsPartie / config.secondesPartie) * 100;
+  } else if (config.mortSubite) {
+    compteur = `SÉRIE : ${bonnes}`;
+    progression = ((index + (figee ? 1 : 0)) / questions.length) * 100;
+  } else {
+    compteur = `QUESTION ${index + 1} / ${questions.length}`;
+    progression = ((index + (figee ? 1 : 0)) / questions.length) * 100;
+  }
+
   const juste = choix === question.bonne_reponse;
 
   return (
     <div className="qz" style={style}>
       <div className="qz__inner">
         <div className="qz-entete">
-          <span>{infosSport.name}</span>
-          <span>QUESTION {index + 1} / {questions.length}</span>
+          <span>{config.nom}</span>
+          <span>{compteur}</span>
           <span className="qz-entete__score">{bonnes} PT{bonnes > 1 ? 'S' : ''}</span>
         </div>
         <div className="qz-barre">
           <div className="qz-barre__remplissage" style={{ width: `${progression}%` }} />
         </div>
 
-        <Timer restant={restant} duree={DUREE} />
+        {chronoGlobal ? (
+          <Timer restant={tempsPartie} duree={config.secondesPartie} />
+        ) : (
+          <Timer restant={restant} duree={config.secondesParQuestion} />
+        )}
 
         <h1 className="qz-question">{question.question}</h1>
 

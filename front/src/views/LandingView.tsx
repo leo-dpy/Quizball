@@ -5,26 +5,17 @@ import logo from '../assets/quizball-logo.png';
 import './LandingView.css';
 
 import { SPORTS } from '../data/sports';
-
-const MODES = [
-  { title: 'SOLO', desc: '10 questions, difficulté croissante. Le classique pour se chauffer.' },
-  { title: 'CONTRE-LA-MONTRE', desc: '60 secondes. Un maximum de bonnes réponses avant la sirène.' },
-  { title: 'SURVIE', desc: "Une seule erreur et c'est fini. Le multiplicateur grimpe à chaque bonne réponse." },
-  { title: 'DUEL 1V1', desc: 'Envoie un lien à un pote, écran splitté, scores côte à côte en direct.' },
-  { title: 'DÉFI DU JOUR', desc: 'La même question pour tout le monde. Résultat partageable, façon grille colorée.' },
-];
+import { MODES } from '../data/modes';
+import type { ModeId } from '../data/modes';
+import { ModeIcon } from '../components/ModeIcon';
+import { serieActuelle } from '../data/serie';
+import type { Offre } from './CheckoutView';
 
 const RETENTION = [
   { title: 'Streak quotidienne', desc: 'Joue chaque jour pour garder ta série. Une notif te prévient avant la rupture.' },
   { title: 'XP & Divisions', desc: 'Amateur → Régional → National → Pro → Légende. Grimpe à chaque partie.' },
   { title: 'Badges à débloquer', desc: 'Tiki-Taka, Buzzer Beater... des dizaines de badges à collectionner.' },
   { title: 'Classements', desc: 'Hebdo qui se reset chaque lundi, et all-time pour les légendes.' },
-];
-
-const STATS = [
-  { label: 'STREAK ACTUELLE', value: '12 JOURS', color: '#FE8D07' },
-  { label: 'DIVISION', value: 'RÉGIONAL', color: '#FFC93C' },
-  { label: 'BADGES', value: '7 / 24', color: '#01C187' },
 ];
 
 const PRICING = [
@@ -47,12 +38,16 @@ function magnetLeave(e: MouseEvent<HTMLElement>) {
 }
 
 interface LandingViewProps {
-  /** Lance une partie sur le sport sélectionné. */
-  onPlay: (sport: string) => void;
+  /** Lance une partie sur le sport sélectionné, dans le mode demandé. */
+  onPlay: (sport: string, mode: ModeId) => void;
+  /** Ouvre la page de paiement (fictive) de l'offre choisie. */
+  onAcheter: (offre: Offre) => void;
 }
 
-export function LandingView({ onPlay }: LandingViewProps) {
+export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
   const [sport, setSport] = useState('foot');
+  // La série du défi du jour, lue au montage de la page
+  const [serie] = useState(() => serieActuelle());
   const [scrolled, setScrolled] = useState(() => window.scrollY > 40);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [subscribed, setSubscribed] = useState(false);
@@ -135,6 +130,16 @@ export function LandingView({ onPlay }: LandingViewProps) {
     });
   };
 
+  const stats = [
+    {
+      label: 'SÉRIE ACTUELLE',
+      value: serie > 0 ? `${serie} JOUR${serie > 1 ? 'S' : ''}` : 'AUCUNE',
+      color: '#FE8D07',
+    },
+    { label: 'DIVISION', value: 'RÉGIONAL', color: '#FFC93C' },
+    { label: 'BADGES', value: '7 / 24', color: '#01C187' },
+  ];
+
   const rootStyle = { '--accent': active.color, '--accent-rgb': active.rgb } as CSSProperties;
   const ballTilt = `perspective(700px) rotateX(${(tilt.y * 10).toFixed(2)}deg) rotateY(${(tilt.x * -10).toFixed(2)}deg)`;
 
@@ -150,7 +155,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
           <a href="#modes">MODES</a>
           <a href="#retention">PROGRESSION</a>
           <a href="#pricing">TARIFS</a>
-          <button type="button" className="qb-btn qb-btn--small" onClick={() => onPlay(sport)} onMouseMove={magnetMove} onMouseLeave={magnetLeave}>
+          <button type="button" className="qb-btn qb-btn--small" onClick={() => onPlay(sport, 'solo')} onMouseMove={magnetMove} onMouseLeave={magnetLeave}>
             JOUER
           </button>
         </nav>
@@ -207,7 +212,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
           </div>
 
           <div className="qb-cta-row">
-            <button type="button" className="qb-btn qb-btn--main" onClick={() => onPlay(sport)} onMouseMove={magnetMove} onMouseLeave={magnetLeave}>
+            <button type="button" className="qb-btn qb-btn--main" onClick={() => onPlay(sport, 'solo')} onMouseMove={magnetMove} onMouseLeave={magnetLeave}>
               JOUER AU QUIZ {active.name}
             </button>
             <a href="#pricing" className="qb-btn qb-btn--ghost">
@@ -224,11 +229,17 @@ export function LandingView({ onPlay }: LandingViewProps) {
         </div>
         <div className="qb-modes">
           {MODES.map((m) => (
-            <div key={m.title} className="qb-glass qb-mode">
-              <div className="qb-mode__icon" />
-              <div className="qb-mode__title">{m.title}</div>
-              <div className="qb-text-muted">{m.desc}</div>
-            </div>
+            <button
+              key={m.id}
+              type="button"
+              className="qb-glass qb-mode"
+              onClick={() => onPlay(sport, m.id)}
+            >
+              <span className="qb-mode__icon"><ModeIcon mode={m.id} /></span>
+              <span className="qb-mode__title">{m.nom}</span>
+              <span className="qb-text-muted">{m.desc}</span>
+              <span className="qb-mode__cta">JOUER EN {m.nom} →</span>
+            </button>
           ))}
         </div>
       </section>
@@ -250,7 +261,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
           </div>
         </div>
         <div className="qb-glass qb-stats">
-          {STATS.map((st) => (
+          {stats.map((st) => (
             <div key={st.label} className="qb-stat">
               <div className="qb-stat__label">{st.label}</div>
               <div className="qb-stat__value" style={{ color: st.color }}>
@@ -277,7 +288,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
                   <li key={f}>— {f}</li>
                 ))}
               </ul>
-              <button type="button" className="qb-btn qb-plan__cta">
+              <button type="button" className="qb-btn qb-plan__cta" onClick={() => onAcheter({ tier: p.tier, price: p.price, features: p.features })}>
                 {p.cta}
               </button>
             </div>
@@ -317,7 +328,7 @@ export function LandingView({ onPlay }: LandingViewProps) {
             <div className="qb-footer__links">
               <a href="#modes">Modes de jeu</a>
               <a href="#pricing">Tarifs</a>
-              <button type="button" className="qb-link-btn" onClick={() => onPlay(sport)}>
+              <button type="button" className="qb-link-btn" onClick={() => onPlay(sport, 'solo')}>
                 Jouer
               </button>
             </div>
