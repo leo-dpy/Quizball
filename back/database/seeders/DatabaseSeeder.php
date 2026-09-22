@@ -37,6 +37,8 @@ class DatabaseSeeder extends Seeder
             Categorie::create($sport);
         }
 
-        $this->command->info('Sports créés. Lance maintenant : php artisan quiz:generer');
+        $this->call(QuestionSeeder::class);
+
+        $this->command->info('Base de données initialisée avec succès avec les sports et les questions !');
     }
 }

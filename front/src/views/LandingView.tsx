@@ -50,8 +50,6 @@ export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
   const [serie] = useState(() => serieActuelle());
   const [scrolled, setScrolled] = useState(() => window.scrollY > 40);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [subscribed, setSubscribed] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
   const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -296,26 +294,6 @@ export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
         </div>
       </section>
 
-      <section className="qb-section qb-newsletter">
-        <div className="qb-newsletter__title">Reçois le quiz du jour</div>
-        <div className="qb-text-muted qb-newsletter__lead">Une question par jour, dans ta boîte mail. Gratuit.</div>
-        {subscribed ? (
-          <div className="qb-newsletter__done">C'est fait — surveille ta boîte mail dès demain.</div>
-        ) : (
-          <form
-            className="qb-newsletter__form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSubscribed(true);
-            }}
-          >
-            <input className="qb-newsletter__input" type="email" required placeholder="ton@email.com" aria-label="Adresse email" />
-            <button type="submit" className="qb-btn qb-newsletter__submit">
-              RECEVOIR
-            </button>
-          </form>
-        )}
-      </section>
 
       <footer className="qb-footer">
         <div className="qb-footer__grid">
@@ -353,9 +331,6 @@ export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
         </div>
         <div className="qb-footer__bottom">
           <div>© 2026 QUIZZBALL. Tous droits réservés.</div>
-          <button type="button" className="qb-sound" aria-pressed={soundOn} onClick={() => setSoundOn((on) => !on)}>
-            {soundOn ? '♪ SON: ON' : '♪ SON: OFF'}
-          </button>
         </div>
       </footer>
     </div>
