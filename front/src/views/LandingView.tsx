@@ -1,4 +1,4 @@
-// Landing page QUIZZBALL (maquette Claude Design portée en React)
+// Page d'accueil QuizBall
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
 import logo from '../assets/quizball-logo.png';

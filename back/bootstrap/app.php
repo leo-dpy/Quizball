@@ -16,7 +16,7 @@ $app = new Illuminate\Foundation\Application(
 );
 
 // Charger le fichier .env situé à la racine du projet s'il existe
-if (file_exists(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . '.env') || file_exists(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . '.env.example')) {
+if (file_exists(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . '.env')) {
     $app->useEnvironmentPath(dirname(__DIR__, 2));
 }
 

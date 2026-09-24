@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './App.css';
 import { LandingView } from './views/LandingView.tsx';
 import { SetupView } from './views/SetupView.tsx';
 import { QuizView } from './views/QuizView.tsx';
