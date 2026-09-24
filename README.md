@@ -61,8 +61,7 @@ php composer-setup.php --quiet && rm composer-setup.php
 
 composer install
 php artisan key:generate
-php artisan migrate:fresh --seed   # crée les tables et les 4 sports
-php artisan quiz:generer           # remplit la base depuis Wikidata (~10 min)
+php artisan migrate:fresh --seed   # crée les tables, les 4 sports et les 144 questions
 php artisan serve                  # http://127.0.0.1:8000
 ```
 
@@ -81,6 +80,51 @@ npm run dev                        # http://localhost:5173
 
 Le serveur Vite redirige `/api` vers `http://127.0.0.1:8000`, donc les deux serveurs
 doivent tourner en même temps pour jouer.
+
+---
+
+## 🐳 Déploiement sur Coolify (VPS + MySQL)
+
+Le projet est entièrement conteneurisé et prêt pour un déploiement en 1 clic sur **Coolify** via Docker Compose.
+
+### Architecture déployée :
+- **Base MySQL** : Hébergée séparément sur ton VPS / Coolify. Le fichier export complet [`quizball_mysql.sql`](quizball_mysql.sql) est fourni à la racine (tables, index, sports et les 144 questions).
+- **`backend`** : API Laravel sous PHP 8.2 & Apache. Au démarrage, il teste la connexion à MySQL, vérifie les migrations (`php artisan migrate --force`) et active le cache de production.
+- **`frontend`** : React 19 compilé et servi par un Nginx ultra-léger. Nginx route automatiquement les requêtes `/api/*` en interne vers le conteneur `backend` : **un seul domaine et un seul certificat SSL suffisent**, sans configuration complexe de CORS !
+
+### Étapes de déploiement dans Coolify :
+
+1. **Remplir ta base de données MySQL** :
+   - Importe le fichier [`quizball_mysql.sql`](quizball_mysql.sql) dans ta base existante (via phpMyAdmin, Adminer, ou en ligne de commande : `mysql -u user -p base < quizball_mysql.sql`).
+
+2. **Créer la ressource dans Coolify** :
+   - Dans ton projet Coolify, clique sur **+ New Resource** > **Public / Private Repository**.
+   - Renseigne l'URL de ton repo Git Quizball.
+   - Choisis le type de build : **Docker Compose**.
+
+3. **Variables d'environnement** :
+   Dans l'onglet **Environment Variables** de Coolify, copie les variables de [`.env.production.example`](.env.production.example) et renseigne les identifiants de ta base de données :
+   ```env
+   APP_NAME=QuizBall
+   APP_ENV=production
+   APP_KEY=base64:7v+2jTSnRNtupINEG5k1s0wDa68hxNlS0ZYh9ARkpUg=
+   APP_DEBUG=false
+   APP_URL=https://ton-domaine.com
+
+   DB_CONNECTION=mysql
+   DB_HOST=ip_ou_hote_de_ta_base
+   DB_PORT=3306
+   DB_DATABASE=nom_de_ta_base
+   DB_USERNAME=ton_utilisateur
+   DB_PASSWORD=ton_mot_de_passe
+   ```
+
+4. **Domaine & SSL** :
+   - Assigne ton domaine (ex: `https://quizball.ton-domaine.com`) au service **`frontend`**.
+   - Coolify génère automatiquement le certificat HTTPS Let's Encrypt.
+
+5. **Déployer** :
+   - Clique sur **Deploy**. Coolify compile le front et le back, valide la connexion à ta base et met le site en ligne !
 
 ---
 
@@ -133,34 +177,21 @@ démonstration) : rien n'est envoyé, rien n'est débité.
 
 ---
 
-## 🧠 D'où viennent les questions
-
-Les questions sont **générées depuis [Wikidata](https://www.wikidata.org)**, en français,
-par la commande `php artisan quiz:generer`.
-
+## 🧠 Les questions du quiz
+ 
+Les questions sont gérées dans le seeder Laravel [QuestionSeeder.php](back/database/seeders/QuestionSeeder.php).
+ 
+- **144 questions au total**, réparties entre les 4 sports (Football, Basket, Tennis, Tous sports).
+- **3 paliers de difficulté réels** :
++  - **Facile** : culture sportive générale accessible à tous.
++  - **Moyen** : pour les amateurs de sport (palmarès, records, finales).
++  - **Difficile** : pour les passionnés (années, anecdotes, détails techniques).
+- **4 propositions par question** : la bonne réponse et 3 leurres crédibles, mélangés à chaque tirage.
+ 
+Pour réinitialiser ou actualiser la base de données :
 ```bash
-php artisan quiz:generer                        # tous les sports, 1000 questions visées chacun
-php artisan quiz:generer --sport=foot --cible=500
-php artisan quiz:generer --garder               # ajoute sans effacer l'existant
+php artisan migrate:fresh --seed
 ```
-
-**Comment ça marche :** chaque « collecte » est une requête SPARQL + un gabarit de question
-(« De quelle nationalité est X ? », « Dans quel stade joue le club Y ? »…). Les mauvaises
-réponses sont tirées des autres valeurs de la même collecte, donc toujours du même type.
-La difficulté vient de la notoriété du sujet sur Wikidata : beaucoup de pages liées = facile.
-
-**Pourquoi pas une API de quiz toute faite ?** Aucune ne convient : l'API française
-(quizzapi) est hors service, OpenTDB n'a que 176 questions de sport en anglais, et
-The Trivia API demande une clé payante pour le français — avec seulement ~40 questions
-de football, ~14 de basket et ~15 de tennis en filtrant par sport.
-
-> ⚠️ **SSL sous Windows** : PHP n'embarque pas de liste d'autorités de certification, donc
-> l'appel à Wikidata échoue avec `cURL error 60`. La commande utilise automatiquement le
-> paquet livré avec Git. Pour en imposer un autre, ajouter dans le `.env` :
-> `WIKIDATA_CA_BUNDLE=C:\chemin\vers\cacert.pem`
-
-La base `database.sqlite` étant versionnée, il n'est pas nécessaire de relancer la
-génération pour jouer : les questions arrivent avec le dépôt.
 
 ---
 

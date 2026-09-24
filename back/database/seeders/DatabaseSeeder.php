@@ -11,12 +11,7 @@ use Illuminate\Support\Facades\Schema;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Crée les 4 sports jouables.
-     *
-     * Les questions ne sont pas écrites ici : elles viennent de Wikidata.
-     * Après ce seeder, lancer `php artisan quiz:generer` pour remplir la base.
-     *
-     * @return void
+     * Initialise la base avec les 4 sports et les questions du quiz.
      */
     public function run()
     {

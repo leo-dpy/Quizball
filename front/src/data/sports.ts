@@ -1,5 +1,3 @@
-// Les sports affichés par le front. Les slugs et couleurs correspondent au seeder Laravel.
-
 export interface Sport {
   id: string;
   name: string;
