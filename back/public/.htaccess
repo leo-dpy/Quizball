@@ -3,6 +3,8 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    DirectoryIndex index.html index.php
+
     RewriteEngine On
 
     # Handle Authorization Header
@@ -14,8 +16,15 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
+    # 1. API Laravel : toutes les requêtes /api/* sont gérées par Laravel
+    RewriteCond %{REQUEST_URI} ^/api(/.*)?$ [NC]
     RewriteRule ^ index.php [L]
+
+    # 2. Fichiers et dossiers réels (assets JS, CSS, images, logos...) servis directement
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # 3. Routes de l'application React SPA : renvoi vers index.html
+    RewriteRule ^ index.html [L]
 </IfModule>

@@ -1,0 +1,12 @@
+.git/
+node_modules/
+front/node_modules/
+front/dist/
+back/vendor/
+back/storage/logs/*.log
+back/storage/framework/cache/data/*
+back/storage/framework/sessions/*
+back/storage/framework/views/*
+*.sqlite
+.env
+.env.*
