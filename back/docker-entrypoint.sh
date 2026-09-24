@@ -7,18 +7,28 @@ echo "==> QuizBall Backend - Démarrage..."
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Si la connexion est configurée pour MySQL, attendre que la base soit joignable
-if [ "${DB_CONNECTION}" = "mysql" ]; then
-    echo "==> Vérification de la connexion à la base de données MySQL (${DB_HOST}:${DB_PORT:-3306})..."
+# Si DATABASE_URL est fournie ou si DB_CONNECTION est mysql
+if [ -n "${DATABASE_URL}" ] || [ "${DB_CONNECTION}" = "mysql" ]; then
+    echo "==> Vérification de la connexion à la base de données MySQL..."
     max_retries=30
     count=0
     until php -r "
     try {
-        \$host = getenv('DB_HOST') ?: '127.0.0.1';
-        \$port = getenv('DB_PORT') ?: '3306';
-        \$db   = getenv('DB_DATABASE') ?: 'quizball';
-        \$user = getenv('DB_USERNAME') ?: 'quizball';
-        \$pass = getenv('DB_PASSWORD') ?: '';
+        \$dbUrl = getenv('DATABASE_URL');
+        if (!empty(\$dbUrl)) {
+            \$parts = parse_url(\$dbUrl);
+            \$host = \$parts['host'] ?? '127.0.0.1';
+            \$port = \$parts['port'] ?? 3306;
+            \$db   = ltrim(\$parts['path'] ?? 'quizball', '/');
+            \$user = isset(\$parts['user']) ? urldecode(\$parts['user']) : 'quizball';
+            \$pass = isset(\$parts['pass']) ? urldecode(\$parts['pass']) : '';
+        } else {
+            \$host = getenv('DB_HOST') ?: '127.0.0.1';
+            \$port = getenv('DB_PORT') ?: '3306';
+            \$db   = getenv('DB_DATABASE') ?: 'quizball';
+            \$user = getenv('DB_USERNAME') ?: 'quizball';
+            \$pass = getenv('DB_PASSWORD') ?: '';
+        }
         new PDO(\"mysql:host=\$host;port=\$port;dbname=\$db\", \$user, \$pass, [
             PDO::ATTR_TIMEOUT => 3,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
@@ -31,7 +41,7 @@ if [ "${DB_CONNECTION}" = "mysql" ]; then
     "; do
         count=$((count+1))
         if [ $count -ge $max_retries ]; then
-            echo "==> Erreur : Impossible de joindre MySQL après $max_retries essais. Vérifie tes variables DB_* dans Coolify."
+            echo "==> Erreur : Impossible de joindre MySQL après $max_retries essais. Vérifie DATABASE_URL ou DB_* dans Coolify."
             exit 1
         fi
         echo "    Nouvel essai dans 2s ($count/$max_retries)..."
