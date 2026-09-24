@@ -95,7 +95,6 @@ Toutes les routes de l'API sont préfixées par `/api` :
 
 ## 🗄️ Base de Données (MySQL 8.0)
 
-L'export complet de la base de données est disponible dans le fichier [`quizball_mysql.sql`](quizball_mysql.sql) à la racine du dépôt.
 
 ### Schéma des tables :
 - **`categories`** : `id`, `slug`, `nom`, `couleur`, `timestamps`
@@ -112,16 +111,7 @@ L'application a été condensée dans **un seul `Dockerfile` tout-en-un** ultra-
 2. **PHP 8.2 & Apache** embarque Laravel et sert le frontend compilé dans `public/`.
 3. Le fichier `.htaccess` redirige automatiquement les appels `/api/*` vers Laravel et le reste vers l'application React.
 
-### Déploiement en 3 étapes :
-1. **Importer la base** : injecter [`quizball_mysql.sql`](quizball_mysql.sql) dans votre MySQL.
-2. **Créer l'application sur Coolify** : lier votre repo GitHub (Build Pack: **Dockerfile**).
-3. **Variable d'environnement** : renseigner uniquement l'URL interne de la base :
-   ```env
-   DATABASE_URL=mysql://utilisateur:mot_de_passe@hote_mysql:3306/nom_de_base
-   ```
-4. Assigner votre nom de domaine et cliquer sur **Deploy**.
 
----
 
 ## 🎤 Préparation à la Soutenance Orale (20 mn)
 
