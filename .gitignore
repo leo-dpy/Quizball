@@ -15,12 +15,11 @@ vendor/
 *.local
 
 # ==========================================
-# Base de données (Conservation de SQLite pour GitHub)
+# Base de données SQLite locales
 # ==========================================
-!*.sqlite
-!*.sqlite3
-!*.db
-!database.sqlite
+*.sqlite
+*.sqlite3
+*.db
 *.sqlite-journal
 
 # ==========================================
