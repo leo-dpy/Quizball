@@ -1,6 +1,6 @@
 # QuizBall ⚽🏀🎾 (Culture Quiz)
 
-**Projet réalisé par Gabriel Favre et Léo Dupuyt — Ynov**
+**Projet réalisé par Gabriel Favre et Léo Dupuy — Ynov**
 
 Application web de quiz sportif conçue en **Mobile-First**, développée en **React (TypeScript + Vite)** pour le frontend et **Laravel 8 (PHP)** pour l'API REST, avec **SQLite** en local et **MySQL** en production.
 
@@ -97,7 +97,7 @@ efface : les questions écrites à la main ne sont jamais touchées.
 
 ## 👥 Répartition des Missions de Développement
 
-> *Conformément aux consignes du sujet, voici la répartition des rôles sur le projet, mené par **Gabriel Favre** et **Léo Dupuyt** :*
+> *Conformément aux consignes du sujet, voici la répartition des rôles sur le projet, mené par **Gabriel Favre** et **Léo Dupuy** :*
 
 - **Frontend & UI/UX (React + TypeScript)** :
   - Conception de l'interface Mobile-First et de la charte graphique sportive.
