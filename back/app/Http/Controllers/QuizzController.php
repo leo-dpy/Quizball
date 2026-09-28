@@ -8,11 +8,6 @@ use Illuminate\Http\Request;
 
 class QuizzController extends Controller
 {
-    /**
-     * La liste des questions (page d'administration).
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return view('listequestions', [
@@ -20,11 +15,6 @@ class QuizzController extends Controller
         ]);
     }
 
-    /**
-     * Le formulaire de création d'une question.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('createQuestion', [
@@ -33,11 +23,6 @@ class QuizzController extends Controller
         ]);
     }
 
-    /**
-     * Enregistre une nouvelle question.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $donnees = $request->validate([

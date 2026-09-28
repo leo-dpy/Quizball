@@ -1,5 +1,3 @@
-// Page de paiement FICTIVE : aucune donnée n'est envoyée, aucun paiement n'est réalisé.
-// Elle sert de maquette pour la démonstration du projet.
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import logo from '../assets/quizball-logo.png';

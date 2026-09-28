@@ -1,4 +1,3 @@
-/* Reset & Typographie de base */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -6,7 +5,6 @@
 }
 
 :root {
-  /* Palette QuizBall, calée sur le logo */
   --bg: #030A14;
   --ink: #F7F8FA;
   --accent: #01C187;

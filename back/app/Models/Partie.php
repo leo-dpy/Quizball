@@ -9,7 +9,6 @@ class Partie extends Model
 {
     use HasFactory;
 
-    /** Les modes de jeu acceptés. */
     public const MODES = ['solo', 'chrono', 'survie', 'defi'];
 
     protected $fillable = [
@@ -21,9 +20,6 @@ class Partie extends Model
         'total',
     ];
 
-    /**
-     * Le sport sur lequel la partie a été jouée.
-     */
     public function categorie()
     {
         return $this->belongsTo(Categorie::class);

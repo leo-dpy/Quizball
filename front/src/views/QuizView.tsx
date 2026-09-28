@@ -1,4 +1,3 @@
-// Écran de jeu. Le comportement dépend du mode : questions comptées, chrono global ou mort subite.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Timer } from '../components/Timer';
@@ -9,9 +8,7 @@ import type { ModeId } from '../data/modes';
 import type { Difficulte, QuestionQuiz, ReponseJoueur } from '../types/quiz';
 import './quiz.css';
 
-/** Réservoir de questions pour les modes sans nombre fixe (chrono, survie). */
 const RESERVE = 30;
-/** Ordre des paliers du mode survie. */
 const PALIERS: Difficulte[] = ['facile', 'moyen', 'difficile'];
 
 interface QuizViewProps {
@@ -36,21 +33,18 @@ export function QuizView({ sport, difficulte, mode, onTermine, onQuitter }: Quiz
   const [tempsPartie, setTempsPartie] = useState(config.secondesPartie);
   const [reponses, setReponses] = useState<ReponseJoueur[]>([]);
 
-  // Copie des réponses lisible depuis les minuteurs, qui ne voient pas l'état à jour
   const reponsesRef = useRef<ReponseJoueur[]>([]);
   const termine = useRef(false);
 
   const infosSport = trouverSport(sport);
   const style = { '--accent': infosSport.color, '--accent-rgb': infosSport.rgb } as CSSProperties;
 
-  /** Termine la partie une seule fois, quel que soit le minuteur qui déclenche. */
   const terminer = useCallback(() => {
     if (termine.current) return;
     termine.current = true;
     onTermine(reponsesRef.current);
   }, [onTermine]);
 
-  // Tirage des questions au démarrage
   useEffect(() => {
     let annule = false;
 
@@ -64,7 +58,6 @@ export function QuizView({ sport, difficulte, mode, onTermine, onQuitter }: Quiz
         if (annule) return;
         let liste = tirage.questions;
 
-        // En survie, on monte les paliers : facile, puis moyen, puis difficile
         if (config.mortSubite) {
           liste = [...liste].sort(
             (a, b) => PALIERS.indexOf(a.difficulte) - PALIERS.indexOf(b.difficulte),
@@ -90,7 +83,6 @@ export function QuizView({ sport, difficulte, mode, onTermine, onQuitter }: Quiz
 
   const question = questions[index];
 
-  /** Enregistre la réponse puis fige la question le temps d'afficher le corrigé. */
   const repondre = useCallback(
     (proposition: string | null) => {
       if (figee || !question) return;
@@ -109,7 +101,6 @@ export function QuizView({ sport, difficulte, mode, onTermine, onQuitter }: Quiz
     [figee, question],
   );
 
-  // Chrono par question (solo, survie, défi)
   useEffect(() => {
     if (config.secondesParQuestion === 0) return;
     if (chargement || erreur || figee || !question) return;
@@ -130,7 +121,6 @@ export function QuizView({ sport, difficulte, mode, onTermine, onQuitter }: Quiz
     return () => window.clearInterval(minuteur);
   }, [chargement, erreur, figee, question, repondre, config.secondesParQuestion]);
 
-  // Chrono global (contre-la-montre) : la sirène arrête la partie sur-le-champ
   useEffect(() => {
     if (config.secondesPartie === 0 || chargement || erreur) return;
 
@@ -150,11 +140,9 @@ export function QuizView({ sport, difficulte, mode, onTermine, onQuitter }: Quiz
     return () => window.clearInterval(minuteur);
   }, [chargement, erreur, config.secondesPartie, terminer]);
 
-  // Passage à la question suivante, ou fin de partie
   useEffect(() => {
     if (!figee) return;
 
-    // Le corrigé s'affiche moins longtemps quand le chrono global tourne
     const pause = config.secondesPartie > 0 ? 700 : 1600;
 
     const suite = window.setTimeout(() => {
@@ -203,7 +191,6 @@ export function QuizView({ sport, difficulte, mode, onTermine, onQuitter }: Quiz
   const bonnes = reponses.filter((r) => r.correcte).length;
   const chronoGlobal = config.secondesPartie > 0;
 
-  // Ce que montre le compteur du milieu et la barre, selon le mode
   let compteur: string;
   let progression: number;
   if (chronoGlobal) {

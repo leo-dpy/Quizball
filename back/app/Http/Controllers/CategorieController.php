@@ -7,11 +7,6 @@ use Illuminate\Http\Request;
 
 class CategorieController extends Controller
 {
-    /**
-     * La liste des sports (page d'administration).
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return view('listecategories', [
@@ -19,11 +14,6 @@ class CategorieController extends Controller
         ]);
     }
 
-    /**
-     * La liste des sports jouables, pour le front React.
-     *
-     * GET /api/categories
-     */
     public function indexApi()
     {
         $categories = Categorie::withCount('questions')->orderBy('id')->get();
@@ -39,21 +29,11 @@ class CategorieController extends Controller
         })->values());
     }
 
-    /**
-     * Le formulaire de création d'un sport.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('createCategorie');
     }
 
-    /**
-     * Enregistre un nouveau sport.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $donnees = $request->validate([

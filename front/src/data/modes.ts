@@ -1,25 +1,16 @@
-// Les modes de jeu : chacun décrit ses propres règles, le reste du code s'y adapte.
 
 export type ModeId = 'solo' | 'chrono' | 'survie' | 'defi';
 
 export interface Mode {
   id: ModeId;
   nom: string;
-  /** Texte de la carte sur la landing. */
   desc: string;
-  /** Règle rappelée sur l'écran de réglages. */
   regle: string;
-  /** Le joueur choisit-il sa difficulté ? */
   choixDifficulte: boolean;
-  /** Nombre de questions ; 0 = on joue jusqu'à la fin du temps ou la première erreur. */
   nbQuestions: number;
-  /** Secondes par question ; 0 = pas de chrono par question. */
   secondesParQuestion: number;
-  /** Secondes pour toute la partie ; 0 = pas de chrono global. */
   secondesPartie: number;
-  /** La partie s'arrête-t-elle à la première erreur ? */
   mortSubite: boolean;
-  /** Les questions sont-elles les mêmes pour tout le monde ce jour-là ? */
   defiDuJour: boolean;
 }
 
@@ -74,12 +65,10 @@ export const MODES: Mode[] = [
   },
 ];
 
-/** Le mode correspondant à l'identifiant, ou le mode solo par défaut. */
 export function trouverMode(id: ModeId | string): Mode {
   return MODES.find((m) => m.id === id) ?? MODES[0];
 }
 
-/** La date du jour au format AAAA-MM-JJ, qui sert de graine au défi. */
 export function graineDuJour(): string {
   const maintenant = new Date();
   const mois = String(maintenant.getMonth() + 1).padStart(2, '0');
@@ -87,7 +76,6 @@ export function graineDuJour(): string {
   return `${maintenant.getFullYear()}-${mois}-${jour}`;
 }
 
-/** La clé de stockage local qui verrouille le défi du jour, par sport. */
 export function cleDefi(sport: string): string {
   return `quizball-defi-${graineDuJour()}-${sport}`;
 }

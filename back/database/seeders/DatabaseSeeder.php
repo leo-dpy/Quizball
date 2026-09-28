@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Initialise la base avec les 4 sports et les questions du quiz.
-     */
     public function run()
     {
         Schema::disableForeignKeyConstraints();
@@ -33,6 +30,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call(QuestionSeeder::class);
+        $this->call(QuestionsManuellesSeeder::class);
 
         $this->command->info('Base de données initialisée avec succès avec les sports et les questions !');
     }

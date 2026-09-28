@@ -1,10 +1,7 @@
-// Définition des types TypeScript pour QuizBall
 import type { ModeId } from '../data/modes';
 
-/** Les niveaux de difficulté ; « toutes » mélange les trois. */
-export type Difficulte = 'facile' | 'moyen' | 'difficile' | 'toutes';
+export type Difficulte = 'facile' | 'moyen' | 'difficile' | 'toutes' | 'progressive';
 
-/** Un sport jouable, tel que renvoyé par /api/categories. */
 export interface Categorie {
   id: number;
   slug: string;
@@ -13,7 +10,6 @@ export interface Categorie {
   nb_questions: number;
 }
 
-/** Une question tirée pour une partie (propositions déjà mélangées par l'API). */
 export interface QuestionQuiz {
   id: number;
   question: string;
@@ -22,7 +18,6 @@ export interface QuestionQuiz {
   bonne_reponse: string;
 }
 
-/** Le tirage complet renvoyé par /api/quiz. */
 export interface Tirage {
   sport: {
     slug: string;
@@ -34,7 +29,6 @@ export interface Tirage {
   questions: QuestionQuiz[];
 }
 
-/** Une ligne du classement (/api/scores). */
 export interface Score {
   id: number;
   pseudo: string;
@@ -47,14 +41,12 @@ export interface Score {
   date: string;
 }
 
-/** Ce que le joueur a répondu à une question, gardé pour le récap final. */
 export interface ReponseJoueur {
   question: QuestionQuiz;
   choix: string | null;
   correcte: boolean;
 }
 
-/** Les réglages d'une partie. */
 export interface Reglages {
   sport: string;
   difficulte: Difficulte;

@@ -1,4 +1,3 @@
-// Écran de fin : score adapté au mode, récap des erreurs et classement
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import logo from '../assets/quizball-logo.png';
@@ -15,13 +14,11 @@ interface ResultsViewProps {
   mode: ModeId;
   pseudo: string;
   reponses: ReponseJoueur[];
-  /** Série de jours consécutifs, calculée à la fin de la partie (défi du jour). */
   serie: number;
   onRejouer: () => void;
   onChangerSport: () => void;
 }
 
-/** Le petit mot qui accompagne le score, selon le mode joué. */
 function bilan(mode: ModeId, score: number, total: number): string {
   if (mode === 'survie') {
     if (score === 0) return 'Éliminé dès la première question. Ça pique.';
@@ -58,9 +55,6 @@ export function ResultsView({ sport, difficulte, mode, pseudo, reponses, serie, 
   const score = reponses.filter((r) => r.correcte).length;
   const ratees = reponses.filter((r) => !r.correcte);
 
-  // Envoi du score, puis récupération du classement du mode.
-  // En mode strict, React monte le composant deux fois : on réutilise la même promesse
-  // d'envoi pour enregistrer le score une seule fois tout en affichant le classement.
   useEffect(() => {
     if (total === 0) return;
 
@@ -84,7 +78,6 @@ export function ResultsView({ sport, difficulte, mode, pseudo, reponses, serie, 
     };
   }, [pseudo, sport, difficulte, mode, score, total]);
 
-  /** Copie le résultat du défi sous forme de grille, à coller dans une conversation. */
   const copierResultat = async () => {
     const grille = reponses.map((r) => (r.correcte ? '🟩' : '🟥')).join('');
     const texte = `QuizBall — Défi du jour ${graineDuJour()} · ${infosSport.name}\n${score}/${total}\n${grille}`;

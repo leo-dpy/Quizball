@@ -1,4 +1,3 @@
-/* Styles communs aux écrans de jeu : réglages, quiz, résultats */
 .qz {
   --accent: #01C187;
   --accent-rgb: 1, 193, 135;
@@ -15,7 +14,6 @@
 .qz__inner {
   width: 100%;
   max-width: 560px;
-  /* centre verticalement quand le contenu est court, sans rogner quand il est long */
   margin-block: auto;
 }
 
@@ -115,7 +113,6 @@
   margin-top: 22px;
 }
 
-/* Sélecteur de mode de jeu */
 .qz-modes {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -146,7 +143,6 @@
   color: var(--accent);
 }
 
-/* Série du défi du jour */
 .qz-serie {
   margin: -14px 0 24px;
   font-family: 'Bebas Neue', sans-serif;
@@ -156,7 +152,6 @@
   text-align: center;
 }
 
-/* Grille de résultat du défi du jour */
 .qz-grille {
   margin: 16px 0 0;
   font-size: 22px;
@@ -236,7 +231,6 @@
   animation: qzPulse 1.4s ease-in-out infinite;
 }
 
-/* ---------- En-tête de partie ---------- */
 .qz-entete {
   display: flex;
   align-items: center;
@@ -267,7 +261,6 @@
   transition: width .3s ease;
 }
 
-/* ---------- Chrono ---------- */
 .qz-chrono {
   position: relative;
   width: 78px;
@@ -313,7 +306,6 @@
   color: #FF5A5A;
 }
 
-/* ---------- Question ---------- */
 .qz-question {
   margin: 0 0 22px;
   font-size: clamp(19px, 4vw, 24px);
@@ -384,7 +376,6 @@
   color: #FF9E9E;
 }
 
-/* ---------- Résultats ---------- */
 .qz-score {
   margin: 0;
   font-family: 'Bebas Neue', sans-serif;

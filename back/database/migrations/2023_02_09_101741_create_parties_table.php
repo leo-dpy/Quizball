@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreatePartiesTable extends Migration
 {
-    /**
-     * Une partie terminée : le score d'un joueur sur un sport.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('parties', function (Blueprint $table) {
@@ -18,18 +13,13 @@ class CreatePartiesTable extends Migration
             $table->string('pseudo');
             $table->foreignId('categorie_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->string('difficulte');
-            $table->string('mode')->default('solo'); // solo, chrono, survie, defi
+            $table->string('mode')->default('solo');
             $table->unsignedInteger('score');
             $table->unsignedInteger('total');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('parties');

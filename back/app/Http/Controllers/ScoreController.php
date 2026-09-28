@@ -8,11 +8,6 @@ use Illuminate\Http\Request;
 
 class ScoreController extends Controller
 {
-    /**
-     * Le classement des meilleurs scores, par sport et par mode de jeu.
-     *
-     * GET /api/scores?sport=foot&mode=solo&limite=10
-     */
     public function index(Request $request)
     {
         $donnees = $request->validate([
@@ -52,17 +47,12 @@ class ScoreController extends Controller
         })->values());
     }
 
-    /**
-     * Enregistre le score d'une partie terminée.
-     *
-     * POST /api/scores
-     */
     public function store(Request $request)
     {
         $donnees = $request->validate([
             'pseudo' => 'required|string|max:20',
             'sport' => 'required|string|exists:categories,slug',
-            'difficulte' => 'required|in:facile,moyen,difficile,toutes',
+            'difficulte' => 'required|in:facile,moyen,difficile,toutes,progressive',
             'mode' => 'required|in:solo,chrono,survie,defi',
             'score' => 'required|integer|min:0',
             'total' => 'required|integer|min:1',

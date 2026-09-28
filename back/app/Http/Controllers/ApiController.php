@@ -7,21 +7,11 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
-    /**
-     * Toutes les questions, avec leur sport.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return response()->json(Question::with('categorie')->get());
     }
 
-    /**
-     * Les règles de validation d'une question.
-     *
-     * @return array<string, string>
-     */
     private function regles(): array
     {
         return [
@@ -35,11 +25,6 @@ class ApiController extends Controller
         ];
     }
 
-    /**
-     * Ajoute une question.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $question = Question::create($request->validate($this->regles()));
@@ -47,12 +32,6 @@ class ApiController extends Controller
         return response()->json($question, 201);
     }
 
-    /**
-     * Modifie une question existante.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $question = Question::find($id);
@@ -66,12 +45,6 @@ class ApiController extends Controller
         return response()->json($question);
     }
 
-    /**
-     * Supprime une question.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $question = Question::find($id);

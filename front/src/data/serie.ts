@@ -1,5 +1,3 @@
-// La série du défi du jour : nombre de jours consécutifs où le défi a été relevé.
-// Tout est gardé dans le navigateur, il n'y a pas de compte utilisateur.
 
 const CLE = 'quizball-serie';
 
@@ -8,7 +6,6 @@ interface EtatSerie {
   dernierJour: string;
 }
 
-/** Une date au format AAAA-MM-JJ. */
 function formater(date: Date): string {
   const mois = String(date.getMonth() + 1).padStart(2, '0');
   const jour = String(date.getDate()).padStart(2, '0');
@@ -36,17 +33,12 @@ function lire(): EtatSerie | null {
   }
 }
 
-/** La série en cours. Elle retombe à 0 si le défi d'hier a été manqué. */
 export function serieActuelle(): number {
   const etat = lire();
   if (!etat) return 0;
   return etat.dernierJour === aujourdhui() || etat.dernierJour === hier() ? etat.jours : 0;
 }
 
-/**
- * Enregistre le défi du jour comme relevé et renvoie la nouvelle série.
- * Rejouer le même jour ne fait pas monter le compteur.
- */
 export function enregistrerJour(): number {
   const etat = lire();
   const jour = aujourdhui();
@@ -58,7 +50,6 @@ export function enregistrerJour(): number {
   try {
     window.localStorage.setItem(CLE, JSON.stringify({ jours, dernierJour: jour }));
   } catch {
-    // stockage indisponible : la série ne sera pas retenue
   }
 
   return jours;

@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateQuestionsTable extends Migration
 {
-    /**
-     * Une question = 1 bonne réponse + 3 mauvaises + une difficulté.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('questions', function (Blueprint $table) {
@@ -21,16 +16,12 @@ class CreateQuestionsTable extends Migration
             $table->string('mauvaise_1');
             $table->string('mauvaise_2');
             $table->string('mauvaise_3');
-            $table->string('difficulte')->default('moyen'); // facile, moyen, difficile
+            $table->string('difficulte')->default('moyen');
+            $table->string('source')->default('manuelle');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('questions');

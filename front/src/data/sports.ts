@@ -12,7 +12,6 @@ export const SPORTS: Sport[] = [
   { id: 'multi', name: 'TOUS SPORTS', color: '#3FA9FF', rgb: '63, 169, 255' },
 ];
 
-/** Le sport correspondant au slug, ou le football par défaut. */
 export function trouverSport(slug: string): Sport {
   return SPORTS.find((s) => s.id === slug) ?? SPORTS[0];
 }

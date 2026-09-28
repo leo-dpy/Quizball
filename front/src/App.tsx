@@ -17,12 +17,11 @@ export function App() {
   const [sport, setSport] = useState('foot');
   const [mode, setMode] = useState<ModeId>('solo');
   const [pseudo, setPseudo] = useState('');
-  const [difficulte, setDifficulte] = useState<Difficulte>('toutes');
+  const [difficulte, setDifficulte] = useState<Difficulte>('progressive');
   const [reponses, setReponses] = useState<ReponseJoueur[]>([]);
   const [offre, setOffre] = useState<Offre | null>(null);
   const [serie, setSerie] = useState(0);
 
-  /** Fin de partie : on retient le résultat du défi du jour et on avance la série. */
   const terminerPartie = (resultat: ReponseJoueur[]) => {
     setReponses(resultat);
 
@@ -30,9 +29,7 @@ export function App() {
       const reussites = resultat.filter((r) => r.correcte).length;
       try {
         window.localStorage.setItem(cleDefi(sport), `${reussites}/${resultat.length}`);
-      } catch {
-        // navigation privée ou stockage refusé : le défi restera rejouable
-      }
+      } catch {}
       setSerie(enregistrerJour());
     }
 

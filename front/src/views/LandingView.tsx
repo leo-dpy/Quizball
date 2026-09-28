@@ -1,4 +1,3 @@
-// Page d'accueil QuizBall
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
 import logo from '../assets/quizball-logo.png';
@@ -24,7 +23,6 @@ const PRICING = [
   { tier: 'CLUB', price: '39,99€/an', features: ['Tout Pro inclus', 'Accès anticipé nouveaux sports', 'Badge Club exclusif'], cta: 'Rejoindre le Club', highlight: false },
 ];
 
-// Effet "aimant" : le bouton suit légèrement la souris
 function magnetMove(e: MouseEvent<HTMLElement>) {
   const el = e.currentTarget;
   const rect = el.getBoundingClientRect();
@@ -38,15 +36,12 @@ function magnetLeave(e: MouseEvent<HTMLElement>) {
 }
 
 interface LandingViewProps {
-  /** Lance une partie sur le sport sélectionné, dans le mode demandé. */
   onPlay: (sport: string, mode: ModeId) => void;
-  /** Ouvre la page de paiement (fictive) de l'offre choisie. */
   onAcheter: (offre: Offre) => void;
 }
 
 export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
   const [sport, setSport] = useState('foot');
-  // La série du défi du jour, lue au montage de la page
   const [serie] = useState(() => serieActuelle());
   const [scrolled, setScrolled] = useState(() => window.scrollY > 40);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
@@ -58,14 +53,12 @@ export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
 
   const active = SPORTS.find((s) => s.id === sport) ?? SPORTS[0];
 
-  // Header compact dès qu'on scrolle
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Fond animé (bandes lumineuses à la couleur du sport)
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -115,7 +108,6 @@ export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
     };
   }, [active.rgb, reducedMotion]);
 
-  // Inclinaison 3D du ballon selon la position de la souris
   const handleHeroMouseMove = (e: MouseEvent<HTMLElement>) => {
     if (reducedMotion || tiltPending.current) return;
     tiltPending.current = true;
@@ -168,7 +160,7 @@ export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
             <span className="qb-accent">le plus fort</span>
           </h1>
           <p className="qb-hero__lead">
-            Football, basket, tennis ou tous les sports. Choisis ton terrain, le quiz démarre aussitôt : 10 questions, 15 secondes chacune, et un classement pour humilier tes potes.
+            Football, basket, tennis ou tous les sports. Choisis ton terrain, le quiz démarre aussitôt : 10 questions, 30 secondes chacune, et un classement pour humilier tes potes.
           </p>
 
           <div className="qb-pills">
@@ -293,7 +285,6 @@ export function LandingView({ onPlay, onAcheter }: LandingViewProps) {
           ))}
         </div>
       </section>
-
 
       <footer className="qb-footer">
         <div className="qb-footer__grid">

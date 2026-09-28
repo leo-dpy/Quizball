@@ -1,4 +1,3 @@
-// Écran de réglages : mode, pseudo et difficulté, avant de lancer la partie
 import { useState } from 'react';
 import type { CSSProperties, FormEvent } from 'react';
 import logo from '../assets/quizball-logo.png';
@@ -10,13 +9,13 @@ import type { Difficulte } from '../types/quiz';
 import './quiz.css';
 
 const DIFFICULTES: { valeur: Difficulte; label: string }[] = [
+  { valeur: 'progressive', label: 'PROGRESSIVE' },
   { valeur: 'toutes', label: 'TOUTES' },
   { valeur: 'facile', label: 'FACILE' },
   { valeur: 'moyen', label: 'MOYEN' },
   { valeur: 'difficile', label: 'DIFFICILE' },
 ];
 
-/** Le score du défi du jour déjà joué sur ce sport, s'il existe. */
 function defiDejaJoue(sport: string): string | null {
   try {
     return window.localStorage.getItem(cleDefi(sport));

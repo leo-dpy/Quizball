@@ -1,4 +1,3 @@
-// Icônes des modes de jeu, dessinées à la main pour rester dans le style du site
 import type { ModeId } from '../data/modes';
 
 interface ModeIconProps {
@@ -20,7 +19,6 @@ export function ModeIcon({ mode, taille = 28 }: ModeIconProps) {
   };
 
   switch (mode) {
-    // Ballon : le mode classique
     case 'solo':
       return (
         <svg {...commun}>
@@ -30,7 +28,6 @@ export function ModeIcon({ mode, taille = 28 }: ModeIconProps) {
         </svg>
       );
 
-    // Chronomètre : contre-la-montre
     case 'chrono':
       return (
         <svg {...commun}>
@@ -40,7 +37,6 @@ export function ModeIcon({ mode, taille = 28 }: ModeIconProps) {
         </svg>
       );
 
-    // Cœur : survie
     case 'survie':
       return (
         <svg {...commun}>
@@ -48,7 +44,6 @@ export function ModeIcon({ mode, taille = 28 }: ModeIconProps) {
         </svg>
       );
 
-    // Calendrier : défi du jour
     default:
       return (
         <svg {...commun}>

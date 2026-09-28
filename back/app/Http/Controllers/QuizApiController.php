@@ -8,18 +8,11 @@ use Illuminate\Http\Request;
 
 class QuizApiController extends Controller
 {
-    /**
-     * Tire les questions d'une partie.
-     *
-     * GET /api/quiz?sport=foot&difficulte=moyen&limite=10
-     * Avec une graine (defi du jour) : GET /api/quiz?sport=foot&graine=2026-09-22
-     * Le tirage est alors identique pour tout le monde tant que la graine ne change pas.
-     */
     public function tirage(Request $request)
     {
         $donnees = $request->validate([
             'sport' => 'required|string|exists:categories,slug',
-            'difficulte' => 'nullable|in:facile,moyen,difficile,toutes',
+            'difficulte' => 'nullable|in:facile,moyen,difficile,toutes,progressive',
             'limite' => 'nullable|integer|min:1|max:50',
             'graine' => 'nullable|string|max:40',
         ]);
@@ -29,13 +22,16 @@ class QuizApiController extends Controller
         $limite = (int) ($donnees['limite'] ?? 10);
         $graine = $donnees['graine'] ?? null;
 
+        if ($difficulte === 'progressive') {
+            return $this->reponse($categorie, $difficulte, $graine, $this->tirageProgressif($categorie->id, $limite));
+        }
+
         $requete = Question::where('categorie_id', $categorie->id);
         if ($difficulte !== 'toutes') {
             $requete->where('difficulte', $difficulte);
         }
 
         if ($graine !== null) {
-            // Tirage reproductible : même graine, mêmes questions dans le même ordre
             mt_srand(crc32($graine . '|' . $categorie->slug));
             $questions = $requete->orderBy('id')->get()->all();
             shuffle($questions);
@@ -44,6 +40,46 @@ class QuizApiController extends Controller
             $questions = $requete->inRandomOrder()->limit($limite)->get();
         }
 
+        return $this->reponse($categorie, $difficulte, $graine, $questions);
+    }
+
+    private function tirageProgressif(int $categorieId, int $limite)
+    {
+        $repartition = [
+            'facile' => (int) round($limite * 0.3),
+            'moyen' => (int) round($limite * 0.4),
+            'difficile' => 0,
+        ];
+        $repartition['difficile'] = $limite - $repartition['facile'] - $repartition['moyen'];
+
+        $questions = collect();
+        $manque = 0;
+
+        foreach ($repartition as $niveau => $nombre) {
+            $lot = Question::where('categorie_id', $categorieId)
+                ->where('difficulte', $niveau)
+                ->inRandomOrder()
+                ->limit($nombre + $manque)
+                ->get();
+
+            $manque = ($nombre + $manque) - $lot->count();
+            $questions = $questions->concat($lot);
+        }
+
+        if ($manque > 0) {
+            $complement = Question::where('categorie_id', $categorieId)
+                ->whereNotIn('id', $questions->pluck('id'))
+                ->inRandomOrder()
+                ->limit($manque)
+                ->get();
+            $questions = $questions->concat($complement);
+        }
+
+        return $questions;
+    }
+
+    private function reponse(Categorie $categorie, string $difficulte, ?string $graine, $questions)
+    {
         return response()->json([
             'sport' => [
                 'slug' => $categorie->slug,

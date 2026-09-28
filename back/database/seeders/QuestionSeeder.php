@@ -8,10 +8,6 @@ use Illuminate\Database\Seeder;
 
 class QuestionSeeder extends Seeder
 {
-    /**
-     * Remplit la base avec 144 vraies questions de sport captivantes,
-     * réparties équitablement entre les 4 catégories et les 3 niveaux.
-     */
     public function run(): void
     {
         Question::truncate();
@@ -20,10 +16,6 @@ class QuestionSeeder extends Seeder
         $now = now();
 
         $questions = [
-            // ==========================================
-            // FOOTBALL (slug: foot)
-            // ==========================================
-            // --- Facile ---
             [
                 'slug' => 'foot',
                 'question' => 'Quel pays a remporté la Coupe du Monde de football en 2018 ?',
@@ -133,7 +125,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'facile',
             ],
 
-            // --- Moyen ---
             [
                 'slug' => 'foot',
                 'question' => 'Quel attaquant portugais a remporté 5 Ballons d\'Or au cours de sa carrière ?',
@@ -243,7 +234,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'moyen',
             ],
 
-            // --- Difficile ---
             [
                 'slug' => 'foot',
                 'question' => 'Quel pays a remporté la toute première Coupe du Monde de football en 1930 ?',
@@ -353,10 +343,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'difficile',
             ],
 
-            // ==========================================
-            // BASKET (slug: basket)
-            // ==========================================
-            // --- Facile ---
             [
                 'slug' => 'basket',
                 'question' => 'Avec quelle franchise Michael Jordan a-t-il conquis ses 6 titres de champion NBA ?',
@@ -466,7 +452,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'facile',
             ],
 
-            // --- Moyen ---
             [
                 'slug' => 'basket',
                 'question' => 'Quel meneur français a remporté 4 bagues NBA avec les Spurs et a été MVP des Finales en 2007 ?',
@@ -576,7 +561,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'moyen',
             ],
 
-            // --- Difficile ---
             [
                 'slug' => 'basket',
                 'question' => 'Quel joueur détient le record absolu du plus grand nombre de points en un match NBA (100 pts en 1962) ?',
@@ -686,10 +670,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'difficile',
             ],
 
-            // ==========================================
-            // TENNIS (slug: tennis)
-            // ==========================================
-            // --- Facile ---
             [
                 'slug' => 'tennis',
                 'question' => 'Sur quelle surface mythique se dispute le tournoi du Grand Chelem de Roland-Garros ?',
@@ -799,7 +779,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'facile',
             ],
 
-            // --- Moyen ---
             [
                 'slug' => 'tennis',
                 'question' => 'Quel joueur est le dernier Français à avoir triomphé en simple messieurs à Roland-Garros (en 1983) ?',
@@ -909,7 +888,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'moyen',
             ],
 
-            // --- Difficile ---
             [
                 'slug' => 'tennis',
                 'question' => 'Quel Australien est le seul joueur de l\'histoire à avoir réalisé deux fois le Grand Chelem calendaire (1962 et 1969) ?',
@@ -1019,10 +997,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'difficile',
             ],
 
-            // ==========================================
-            // TOUS SPORTS (slug: multi)
-            // ==========================================
-            // --- Facile ---
             [
                 'slug' => 'multi',
                 'question' => 'Tous les combien d\'années les Jeux Olympiques d\'été ont-ils lieu en règle générale ?',
@@ -1132,7 +1106,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'facile',
             ],
 
-            // --- Moyen ---
             [
                 'slug' => 'multi',
                 'question' => 'Quel nageur américain est l\'athlète le plus médaillé de l\'histoire des JO avec 23 médailles d\'or ?',
@@ -1242,7 +1215,6 @@ class QuestionSeeder extends Seeder
                 'difficulte' => 'moyen',
             ],
 
-            // --- Difficile ---
             [
                 'slug' => 'multi',
                 'question' => 'Quel pilote français a remporté 4 titres de champion du monde de F1 et entretenu une rivalité mythique avec Senna ?',

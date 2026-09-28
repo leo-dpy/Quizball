@@ -1,9 +1,6 @@
-// Composant chronomètre : anneau qui se vide sur la durée d'une question
 
 interface TimerProps {
-  /** Secondes restantes (peut être décimal pour une animation fluide). */
   restant: number;
-  /** Durée totale d'une question, en secondes. */
   duree: number;
 }
 

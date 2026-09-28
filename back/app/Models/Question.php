@@ -9,7 +9,6 @@ class Question extends Model
 {
     use HasFactory;
 
-    /** Les trois niveaux acceptés. */
     public const DIFFICULTES = ['facile', 'moyen', 'difficile'];
 
     protected $fillable = [
@@ -20,21 +19,14 @@ class Question extends Model
         'mauvaise_2',
         'mauvaise_3',
         'difficulte',
+        'source',
     ];
 
-    /**
-     * Le sport auquel la question appartient.
-     */
     public function categorie()
     {
         return $this->belongsTo(Categorie::class);
     }
 
-    /**
-     * Les 4 propositions, mélangées : la bonne réponse et les trois leurres.
-     *
-     * @return array<int, string>
-     */
     public function propositions(): array
     {
         $propositions = [
